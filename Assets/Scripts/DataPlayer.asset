@@ -19,8 +19,8 @@ MonoBehaviour:
   fastFallGravityMult: 2
   maxFastFallSpeed: 30
   runMaxSpeed: 8
-  runAcceleration: 2.5
-  runAccelAmount: 15.625
+  runAcceleration: 2
+  runAccelAmount: 12.5
   runDecceleration: 6
   runDeccelAmount: 37.5
   accelInAir: 0.664
@@ -42,8 +42,9 @@ MonoBehaviour:
   slideAccel: 12
   coyoteTime: 0.1
   jumpInputBufferTime: 0.25
+  shadowDashDelaySecond: 0.015
   dashAmount: 1
-  dashSpeed: 20
+  dashSpeed: 27
   dashSleepTime: 0.05
   dashAttackTime: 0.15
   dashEndTime: 0.15

@@ -1,13 +1,16 @@
 using System.Collections;
 using UnityEngine;
-
 public class PlayerMovement : MonoBehaviour
 {
     public PlayerDataWithDash Data;
 
     #region COMPONENTS
-    public Rigidbody2D RB { get; private set; }
-    public Animator playeranim;
+    [SerializeField] private Rigidbody2D RB;
+    [SerializeField] private Animator playeranim;
+    [SerializeField] private GameObject shadowDash;
+    [SerializeField] private SpriteRenderer sr;
+    [SerializeField] private GameObject waveLight;
+    [SerializeField] private Camera mainCamera;
     #endregion
 
     #region STATE PARAMETERS
@@ -16,6 +19,10 @@ public class PlayerMovement : MonoBehaviour
     public bool IsWallJumping { get; private set; }
     public bool IsDashing { get; private set; }
     public bool IsSliding { get; private set; }
+
+    private bool _isLeftPressed; // Trạng thái phím trái
+    private bool _isRightPressed; // Trạng thái phím phải
+    private int _lastPressedDirection; // 1: phải, -1: trái, 0: không có
 
     public float LastOnGroundTime { get; private set; }
     public float LastOnWallTime { get; private set; }
@@ -32,10 +39,16 @@ public class PlayerMovement : MonoBehaviour
     private bool _dashRefilling;
     private Vector2 _lastDashDir;
     private bool _isDashAttacking;
+    private Coroutine dashEffectCoroutine;
+
+    // private float _defaultOrthoSize; // Lưu kích thước camera ban đầu
+    // private float _zoomOrthoSize; // Kích thước khi zoom
+    // private float _zoomDuration = 0.2f; // Thời gian zoom
+    // private float _zoomAmount = 0.5f; // Mức độ zoom (giảm orthographicSize đi 0.5)
 
     private bool _isFacingLocked; // New flag to lock facing direction
     public int facingLockFrames;
-	private int _facingLockFrames; // Counter for frames to lock facing
+    private int _facingLockFrames; // Counter for frames to lock facing
     #endregion
 
     #region INPUT PARAMETERS
@@ -69,6 +82,12 @@ public class PlayerMovement : MonoBehaviour
     {
         SetGravityScale(Data.gravityScale);
         IsFacingRight = true;
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main;
+        }
+        // _defaultOrthoSize = mainCamera.orthographicSize; // Lưu kích thước ban đầu
+        // _zoomOrthoSize = _defaultOrthoSize - _zoomAmount; // Tính kích thước khi zoom
     }
 
     private void Update()
@@ -84,23 +103,58 @@ public class PlayerMovement : MonoBehaviour
         #endregion
 
         #region INPUT HANDLER
-        _moveInput.x = Input.GetAxisRaw("Horizontal");
+        // Kiểm tra trạng thái phím
+        bool leftPressed = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
+        bool rightPressed = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
+
+        // Cập nhật trạng thái khi nhấn phím
+        if (leftPressed && !_isLeftPressed) // Phím trái vừa được nhấn
+        {
+            _lastPressedDirection = -1; // Ưu tiên trái
+        }
+        if (rightPressed && !_isRightPressed) // Phím phải vừa được nhấn
+        {
+            _lastPressedDirection = 1; // Ưu tiên phải
+        }
+
+        // Cập nhật trạng thái khi thả phím
+        if (!leftPressed && _isLeftPressed) // Thả phím trái
+        {
+            if (_lastPressedDirection == -1) // Nếu trái là phím ưu tiên
+            {
+                _lastPressedDirection = rightPressed ? 1 : 0; // Chuyển sang phải nếu đang giữ phải
+            }
+        }
+        if (!rightPressed && _isRightPressed) // Thả phím phải
+        {
+            if (_lastPressedDirection == 1) // Nếu phải là phím ưu tiên
+            {
+                _lastPressedDirection = leftPressed ? -1 : 0; // Chuyển sang trái nếu đang giữ trái
+            }
+        }
+
+        // Cập nhật trạng thái phím
+        _isLeftPressed = leftPressed;
+        _isRightPressed = rightPressed;
+
+        // Áp dụng giá trị _moveInput.x dựa trên phím ưu tiên
+        _moveInput.x = _lastPressedDirection;
         _moveInput.y = Input.GetAxisRaw("Vertical");
 
         if (_moveInput.x != 0)
             CheckDirectionToFace(_moveInput.x > 0);
 
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.C) || Input.GetKeyDown(KeyCode.J))
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.J))
         {
             OnJumpInput();
         }
 
-        if (Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.C) || Input.GetKeyUp(KeyCode.J))
+        if (Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.Z) || Input.GetKeyUp(KeyCode.J))
         {
             OnJumpUpInput();
         }
 
-        if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.K))
+        if (Input.GetKeyDown(KeyCode.C) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.K))
         {
             OnDashInput();
         }
@@ -257,7 +311,8 @@ public class PlayerMovement : MonoBehaviour
             playeranim.SetBool("fall", false);
         }
 
-        if(isGrounded || !_isJumpFalling){
+        if (isGrounded || !_isJumpFalling)
+        {
             playeranim.SetTrigger("land");
         }
 
@@ -436,9 +491,8 @@ public class PlayerMovement : MonoBehaviour
 
         _dashesLeft--;
         _isDashAttacking = true;
-
+        StartDashEffect();
         SetGravityScale(0);
-
         while (Time.time - startTime <= Data.dashAttackTime)
         {
             RB.velocity = dir.normalized * Data.dashSpeed;
@@ -456,6 +510,7 @@ public class PlayerMovement : MonoBehaviour
         {
             yield return null;
         }
+        if (dashEffectCoroutine != null) StopCoroutine(dashEffectCoroutine);
 
         IsDashing = false;
     }
@@ -467,6 +522,31 @@ public class PlayerMovement : MonoBehaviour
         _dashRefilling = false;
         _dashesLeft = Mathf.Min(Data.dashAmount, _dashesLeft + 1);
     }
+
+    private void StartDashEffect()
+    {
+        if (dashEffectCoroutine != null) StopCoroutine(dashEffectCoroutine);
+        dashEffectCoroutine = StartCoroutine(DashEffectCoroutine());
+    }
+
+    private IEnumerator DashEffectCoroutine()
+    {
+        // GameObject light = Instantiate(waveLight, transform.position, transform.rotation);
+        // Destroy(light, 0.3f);
+        FindObjectOfType<RippleEffect>().Emit(Camera.main.WorldToViewportPoint(transform.position));
+        GetComponent<Cinemachine.CinemachineImpulseSource>().GenerateImpulse(_lastDashDir.normalized * 0.15f);
+        while (true)
+        {
+            GameObject shadow = Instantiate(shadowDash, transform.position, transform.rotation);
+            shadow.transform.localScale = transform.localScale;
+            shadow.GetComponent<SpriteRenderer>().sprite = sr.sprite;
+            Destroy(shadow, 0.5f);
+
+            yield return new WaitForSeconds(Data.shadowDashDelaySecond);
+        }
+    }
+
+
     #endregion
 
     #region OTHER MOVEMENT METHODS

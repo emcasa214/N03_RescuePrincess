@@ -63,6 +63,7 @@ public class PlayerDataWithDash : ScriptableObject
     [Space(20)]
 
     [Header("Dash")]
+    public float shadowDashDelaySecond;
     public int dashAmount;
     public float dashSpeed;
     public float dashSleepTime;

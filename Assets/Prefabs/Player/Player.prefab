@@ -10008,7 +10008,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6233525174675034486}
-  - component: {fileID: 4358411251484592282}
   - component: {fileID: 2659085459964093352}
   - component: {fileID: 8200573773381441054}
   - component: {fileID: 8069832899926162864}
@@ -10041,31 +10040,6 @@ Transform:
   - {fileID: 4877539555014450741}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4358411251484592282
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5267647101087183654}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d4a31ff104c69749a6b245ac327ad68, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 8
-  jumpForce: 60
-  doubleJumpForce: 40
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 1
-  groundCheck: {fileID: 4877539555014450741}
-  playeranim: {fileID: 8417796835056745608}
-  controlmode: 1
-  isPaused: 0
-  footsteps: {fileID: 6868031497527484232}
-  ImpactEffect: {fileID: 6764990211577253867}
-  fireRate: 0.5
 --- !u!50 &2659085459964093352
 Rigidbody2D:
   serializedVersion: 4
@@ -10090,7 +10064,7 @@ Rigidbody2D:
     serializedVersion: 2
     m_Bits: 0
   m_Interpolate: 1
-  m_SleepingMode: 1
+  m_SleepingMode: 0
   m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!70 &8200573773381441054
@@ -10142,6 +10116,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Data: {fileID: 11400000, guid: a455dd0e3536c3d479e95bfcad1fe78d, type: 2}
   playeranim: {fileID: 8417796835056745608}
+  shadowDash: {fileID: 0}
+  sr: {fileID: 0}
+  facingLockFrames: 0
   _groundCheckPoint: {fileID: 4877539555014450741}
   _groundCheckSize: {x: 0.32, y: 0.09}
   _frontWallCheckPoint: {fileID: 2139068091532996412}
