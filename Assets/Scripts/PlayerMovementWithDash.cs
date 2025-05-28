@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+
 public class PlayerMovement : MonoBehaviour
 {
     public PlayerDataWithDash Data;
@@ -8,8 +9,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Rigidbody2D RB;
     [SerializeField] private Animator playeranim;
     [SerializeField] private GameObject shadowDash;
+    [SerializeField] private ParticleSystem ImpactEffect;
     [SerializeField] private SpriteRenderer sr;
-    [SerializeField] private GameObject waveLight;
+
     [SerializeField] private Camera mainCamera;
     #endregion
 
@@ -20,9 +22,9 @@ public class PlayerMovement : MonoBehaviour
     public bool IsDashing { get; private set; }
     public bool IsSliding { get; private set; }
 
-    private bool _isLeftPressed; // Trạng thái phím trái
-    private bool _isRightPressed; // Trạng thái phím phải
-    private int _lastPressedDirection; // 1: phải, -1: trái, 0: không có
+    private bool _isLeftPressed;
+    private bool _isRightPressed;
+    private int _lastPressedDirection;
 
     public float LastOnGroundTime { get; private set; }
     public float LastOnWallTime { get; private set; }
@@ -41,14 +43,12 @@ public class PlayerMovement : MonoBehaviour
     private bool _isDashAttacking;
     private Coroutine dashEffectCoroutine;
 
-    // private float _defaultOrthoSize; // Lưu kích thước camera ban đầu
-    // private float _zoomOrthoSize; // Kích thước khi zoom
-    // private float _zoomDuration = 0.2f; // Thời gian zoom
-    // private float _zoomAmount = 0.5f; // Mức độ zoom (giảm orthographicSize đi 0.5)
-
-    private bool _isFacingLocked; // New flag to lock facing direction
+    private bool _isFacingLocked;
     public int facingLockFrames;
-    private int _facingLockFrames; // Counter for frames to lock facing
+    private int _facingLockFrames;
+
+    // Thêm biến để lưu trạng thái chạm đất của khung hình trước
+    private bool _wasOnGroundLastFrame;
     #endregion
 
     #region INPUT PARAMETERS
@@ -86,8 +86,6 @@ public class PlayerMovement : MonoBehaviour
         {
             mainCamera = Camera.main;
         }
-        // _defaultOrthoSize = mainCamera.orthographicSize; // Lưu kích thước ban đầu
-        // _zoomOrthoSize = _defaultOrthoSize - _zoomAmount; // Tính kích thước khi zoom
     }
 
     private void Update()
@@ -103,41 +101,36 @@ public class PlayerMovement : MonoBehaviour
         #endregion
 
         #region INPUT HANDLER
-        // Kiểm tra trạng thái phím
         bool leftPressed = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
         bool rightPressed = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
 
-        // Cập nhật trạng thái khi nhấn phím
-        if (leftPressed && !_isLeftPressed) // Phím trái vừa được nhấn
+        if (leftPressed && !_isLeftPressed)
         {
-            _lastPressedDirection = -1; // Ưu tiên trái
+            _lastPressedDirection = -1;
         }
-        if (rightPressed && !_isRightPressed) // Phím phải vừa được nhấn
+        if (rightPressed && !_isRightPressed)
         {
-            _lastPressedDirection = 1; // Ưu tiên phải
+            _lastPressedDirection = 1;
         }
 
-        // Cập nhật trạng thái khi thả phím
-        if (!leftPressed && _isLeftPressed) // Thả phím trái
+        if (!leftPressed && _isLeftPressed)
         {
-            if (_lastPressedDirection == -1) // Nếu trái là phím ưu tiên
+            if (_lastPressedDirection == -1)
             {
-                _lastPressedDirection = rightPressed ? 1 : 0; // Chuyển sang phải nếu đang giữ phải
+                _lastPressedDirection = rightPressed ? 1 : 0;
             }
         }
-        if (!rightPressed && _isRightPressed) // Thả phím phải
+        if (!rightPressed && _isRightPressed)
         {
-            if (_lastPressedDirection == 1) // Nếu phải là phím ưu tiên
+            if (_lastPressedDirection == 1)
             {
-                _lastPressedDirection = leftPressed ? -1 : 0; // Chuyển sang trái nếu đang giữ trái
+                _lastPressedDirection = leftPressed ? -1 : 0;
             }
         }
 
-        // Cập nhật trạng thái phím
         _isLeftPressed = leftPressed;
         _isRightPressed = rightPressed;
 
-        // Áp dụng giá trị _moveInput.x dựa trên phím ưu tiên
         _moveInput.x = _lastPressedDirection;
         _moveInput.y = Input.GetAxisRaw("Vertical");
 
@@ -184,7 +177,6 @@ public class PlayerMovement : MonoBehaviour
         if (IsJumping && RB.velocity.y < 0)
         {
             IsJumping = false;
-
             if (!IsWallJumping)
                 _isJumpFalling = true;
         }
@@ -197,7 +189,6 @@ public class PlayerMovement : MonoBehaviour
         if (LastOnGroundTime > 0 && !IsJumping && !IsWallJumping)
         {
             _isJumpCut = false;
-
             if (!IsJumping)
                 _isJumpFalling = false;
         }
@@ -216,13 +207,10 @@ public class PlayerMovement : MonoBehaviour
             {
                 IsWallJumping = true;
                 IsJumping = false;
-
                 _isJumpCut = false;
                 _isJumpFalling = false;
-
                 _wallJumpStartTime = Time.time;
                 _lastWallJumpDir = (LastOnWallRightTime > 0) ? -1 : 1;
-
                 WallJump(_lastWallJumpDir);
             }
         }
@@ -232,7 +220,6 @@ public class PlayerMovement : MonoBehaviour
         if (CanDash() && LastPressedDashTime > 0)
         {
             Sleep(Data.dashSleepTime);
-
             if (_moveInput != Vector2.zero)
                 _lastDashDir = _moveInput;
             else
@@ -242,7 +229,6 @@ public class PlayerMovement : MonoBehaviour
             IsJumping = false;
             IsWallJumping = false;
             _isJumpCut = false;
-
             StartCoroutine(nameof(StartDash), _lastDashDir);
         }
         #endregion
@@ -291,18 +277,15 @@ public class PlayerMovement : MonoBehaviour
         }
         #endregion
 
-        #region Fall anim
-        bool isGrounded = LastOnGroundTime > 0;
-        if (isGrounded)
+        #region Fall and Land Animation
+        // Kiểm tra trạng thái "vừa chạm đất"
+        if (!_wasOnGroundLastFrame && LastOnGroundTime > 0)
         {
-            playeranim.SetBool("ground", true);
-        }
-        else
-        {
-            playeranim.SetBool("ground", false);
+            playeranim.SetTrigger("land"); // Kích hoạt animation "land" khi vừa chạm đất
+            PlayImpactEffect();
         }
 
-        if (_isJumpFalling)
+        if (!_wasOnGroundLastFrame && LastOnGroundTime == 0)
         {
             playeranim.SetBool("fall", true);
         }
@@ -311,12 +294,28 @@ public class PlayerMovement : MonoBehaviour
             playeranim.SetBool("fall", false);
         }
 
-        if (isGrounded || !_isJumpFalling)
+        if (LastOnGroundTime > 0)
         {
-            playeranim.SetTrigger("land");
+            playeranim.SetBool("ground", true);
+        }
+        else
+        {
+            playeranim.SetBool("ground", false);
         }
 
+        if (LastOnGroundTime <= 0 && RB.velocity.y < 0)
+        {
+            playeranim.SetBool("fall", true);
+        }
+        else
+        {
+            playeranim.SetBool("fall", false);
+        }
+
+        // Lưu trạng thái chạm đất cho khung hình tiếp theo
+        _wasOnGroundLastFrame = LastOnGroundTime > 0;
         #endregion
+
     }
 
     private void FixedUpdate()
@@ -336,7 +335,6 @@ public class PlayerMovement : MonoBehaviour
         if (IsSliding)
             Slide();
 
-        // Decrease facing lock frame counter
         if (_isFacingLocked)
         {
             _facingLockFrames--;
@@ -397,29 +395,24 @@ public class PlayerMovement : MonoBehaviour
         {
             playeranim.SetBool("run", false);
         }
-        #region Calculate AccelRate
+
         float accelRate;
 
         if (LastOnGroundTime > 0)
             accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? Data.runAccelAmount : Data.runDeccelAmount;
         else
             accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? Data.runAccelAmount * Data.accelInAir : Data.runDeccelAmount * Data.deccelInAir;
-        #endregion
 
-        #region Add Bonus Jump Apex Acceleration
         if ((IsJumping || IsWallJumping || _isJumpFalling) && Mathf.Abs(RB.velocity.y) < Data.jumpHangTimeThreshold)
         {
             accelRate *= Data.jumpHangAccelerationMult;
             targetSpeed *= Data.jumpHangMaxSpeedMult;
         }
-        #endregion
 
-        #region Conserve Momentum
         if (Data.doConserveMomentum && Mathf.Abs(RB.velocity.x) > Mathf.Abs(targetSpeed) && Mathf.Sign(RB.velocity.x) == Mathf.Sign(targetSpeed) && Mathf.Abs(targetSpeed) > 0.01f && LastOnGroundTime < 0)
         {
             accelRate = 0;
         }
-        #endregion
 
         float speedDif = targetSpeed - RB.velocity.x;
         float movement = speedDif * accelRate;
@@ -457,14 +450,12 @@ public class PlayerMovement : MonoBehaviour
         LastOnWallRightTime = 0;
         LastOnWallLeftTime = 0;
 
-        // Set facing direction opposite to wall jump direction
-        bool shouldFaceRight = dir > 0; // If jumping right (dir = 1), face right
+        bool shouldFaceRight = dir > 0;
         if (shouldFaceRight != IsFacingRight)
         {
             Turn();
         }
 
-        // Lock facing direction for 2 frames
         _isFacingLocked = true;
         _facingLockFrames = facingLockFrames;
 
@@ -476,9 +467,20 @@ public class PlayerMovement : MonoBehaviour
 
         if (RB.velocity.y < 0)
             force.y -= RB.velocity.y;
-
+        playeranim.SetTrigger("jump");
+        PlayImpactEffect();
         RB.AddForce(force, ForceMode2D.Impulse);
     }
+
+    //landed effect
+    void PlayImpactEffect()
+    {
+        // if (!ImpactEffect.isPlaying)
+        // {
+            ImpactEffect.Play();
+        // }
+    }
+
     #endregion
 
     #region DASH METHODS
@@ -531,8 +533,6 @@ public class PlayerMovement : MonoBehaviour
 
     private IEnumerator DashEffectCoroutine()
     {
-        // GameObject light = Instantiate(waveLight, transform.position, transform.rotation);
-        // Destroy(light, 0.3f);
         FindObjectOfType<RippleEffect>().Emit(Camera.main.WorldToViewportPoint(transform.position));
         GetComponent<Cinemachine.CinemachineImpulseSource>().GenerateImpulse(_lastDashDir.normalized * 0.15f);
         while (true)
@@ -545,8 +545,6 @@ public class PlayerMovement : MonoBehaviour
             yield return new WaitForSeconds(Data.shadowDashDelaySecond);
         }
     }
-
-
     #endregion
 
     #region OTHER MOVEMENT METHODS
@@ -563,7 +561,6 @@ public class PlayerMovement : MonoBehaviour
     #region CHECK METHODS
     public void CheckDirectionToFace(bool isMovingRight)
     {
-        // Skip direction change if facing is locked
         if (_isFacingLocked)
             return;
 
