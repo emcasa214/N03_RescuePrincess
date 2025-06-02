@@ -3,6 +3,8 @@ using System.Collections;
 
 public class RippleEffect : MonoBehaviour
 {
+    public static RippleEffect Instance { get; private set; }
+
     public AnimationCurve waveform = new AnimationCurve(
         new Keyframe(0.00f, 0.50f, 0, 0),
         new Keyframe(0.05f, 1.00f, 0, 0),
@@ -96,6 +98,9 @@ public class RippleEffect : MonoBehaviour
 
     void Awake()
     {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject); // tránh duplicate
+        
         if (shader == null)
         {
             Debug.LogError("Shader is not assigned in RippleEffect.", this);
