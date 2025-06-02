@@ -5077,7 +5077,7 @@ ParticleSystem:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5129007705980979559}
   serializedVersion: 8
-  lengthInSec: 0.6
+  lengthInSec: 0.4
   simulationSpeed: 1
   stopAction: 0
   cullingMode: 0
@@ -5152,7 +5152,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1
+      scalar: 0.3
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -5259,7 +5259,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 0.6377357, g: 0.5619294, b: 0.5619294, a: 1}
+      maxColor: {r: 0.8074702, g: 0.8074702, b: 0.8074702, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -5647,7 +5647,7 @@ ParticleSystem:
     gravityModifier:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.1
+      scalar: 0
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -6585,12 +6585,12 @@ ParticleSystem:
     flipU: 0
     flipV: 0
   VelocityModule:
-    enabled: 0
+    enabled: 1
     x:
       serializedVersion: 2
-      minMaxState: 0
-      scalar: 0
-      minScalar: 0
+      minMaxState: 3
+      scalar: -0.58
+      minScalar: 0.1
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -6641,9 +6641,9 @@ ParticleSystem:
         m_RotationOrder: 4
     y:
       serializedVersion: 2
-      minMaxState: 0
-      scalar: 0
-      minScalar: 0
+      minMaxState: 3
+      scalar: -2.33
+      minScalar: -0.84
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -6694,7 +6694,7 @@ ParticleSystem:
         m_RotationOrder: 4
     z:
       serializedVersion: 2
-      minMaxState: 0
+      minMaxState: 3
       scalar: 0
       minScalar: 0
       maxCurve:
@@ -7119,7 +7119,7 @@ ParticleSystem:
     speedModifier:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1
+      scalar: 0.2
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -10040,10 +10040,10 @@ GameObject:
   m_Component:
   - component: {fileID: 6233525174675034486}
   - component: {fileID: 2659085459964093352}
-  - component: {fileID: 8200573773381441054}
   - component: {fileID: 8069832899926162864}
   - component: {fileID: 7504373193400870778}
   - component: {fileID: 2632382207802298017}
+  - component: {fileID: 394445393842473687}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -10060,7 +10060,7 @@ Transform:
   m_GameObject: {fileID: 5267647101087183654}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.08, y: -1.99, z: 0}
+  m_LocalPosition: {x: -8.08, y: -2.255, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -10098,44 +10098,9 @@ Rigidbody2D:
     serializedVersion: 2
     m_Bits: 0
   m_Interpolate: 1
-  m_SleepingMode: 0
+  m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!70 &8200573773381441054
-CapsuleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5267647101087183654}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 6200000, guid: e57c154f727d3a74db9d4424add7d341, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: -0.09705776, y: -0.160752}
-  m_Size: {x: 0.6941155, y: 1.4246279}
-  m_Direction: 0
 --- !u!114 &8069832899926162864
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10229,3 +10194,63 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ad9f67ee92ea2441991bb4f8930b97e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  knockbackMultiplier: 17
+  deadAnim: {fileID: 1838396611715124854, guid: 0b256b8e68610f14e80ad4099ffeea1d, type: 3}
+  respawnAnim: {fileID: 9147500147424456926, guid: 845a0e296e9885b4680d530d81ae079d, type: 3}
+  delayEff: 35
+  transitionEffect: {fileID: 4574219851784324889, guid: 4a63da23459eb7f4489f9166210009fe, type: 3}
+--- !u!60 &394445393842473687
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5267647101087183654}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: 0.3735094, y: 0.06781876}
+      - {x: 0.17141008, y: 0.5397148}
+      - {x: -0.30305862, y: 0.5346271}
+      - {x: -0.5172548, y: 0.04754758}
+      - {x: -0.278637, y: -0.23074898}
+      - {x: -0.27223396, y: -0.7473593}
+      - {x: -0.2251696, y: -0.8270334}
+      - {x: 0.10989773, y: -0.8273859}
+      - {x: 0.16369057, y: -0.74019957}
+      - {x: 0.14598227, y: -0.22502905}
+  m_UseDelaunayMesh: 0
