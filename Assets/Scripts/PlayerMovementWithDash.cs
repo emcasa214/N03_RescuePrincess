@@ -5,8 +5,10 @@ public class PlayerMovement : MonoBehaviour
 {
     public PlayerDataWithDash Data;
 
+    public static PlayerMovement Instance { get; private set; }
+
     #region COMPONENTS
-    [SerializeField] private Rigidbody2D RB;
+    [SerializeField] public Rigidbody2D RB;
     [SerializeField] private Animator playeranim;
     [SerializeField] private GameObject shadowDash;
     [SerializeField] private ParticleSystem ImpactEffect;
@@ -60,7 +62,7 @@ public class PlayerMovement : MonoBehaviour
 
     #region CHECK PARAMETERS
     [Header("Checks")]
-    [SerializeField] private Transform _groundCheckPoint;
+    [SerializeField] public Transform _groundCheckPoint;
     [SerializeField] private Vector2 _groundCheckSize = new Vector2(0.49f, 0.03f);
     [Space(5)]
     [SerializeField] private Transform _frontWallCheckPoint;
@@ -76,6 +78,14 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         RB = GetComponent<Rigidbody2D>();
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject); // Hủy nếu đã có instance khác
+        }
     }
 
     private void Start()
@@ -431,6 +441,14 @@ public class PlayerMovement : MonoBehaviour
     #endregion
 
     #region JUMP METHODS
+
+    public void JumpPadState()
+    {
+        IsJumping = true;
+        _isJumpCut = false;
+        _isJumpFalling = false;
+        playeranim.SetTrigger("jump");
+    }
     private void Jump()
     {
         LastPressedJumpTime = 0;
@@ -533,7 +551,8 @@ public class PlayerMovement : MonoBehaviour
 
     private IEnumerator DashEffectCoroutine()
     {
-        FindObjectOfType<RippleEffect>().Emit(Camera.main.WorldToViewportPoint(transform.position));
+        // FindObjectOfType<RippleEffect>().Emit(Camera.main.WorldToViewportPoint(transform.position));
+        RippleEffect.Instance.Emit(Camera.main.WorldToViewportPoint(transform.position));
         GetComponent<Cinemachine.CinemachineImpulseSource>().GenerateImpulse(_lastDashDir.normalized * 0.15f);
         while (true)
         {
