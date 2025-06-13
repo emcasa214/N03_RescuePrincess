@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f701c704d132efa4885b0b0e76f154bb, type: 3}
+  m_Name: DataPlayer
+  m_EditorClassIdentifier: 
+  gravityStrength: -60.606056
+  gravityScale: 2.020202
+  fallGravityMult: 1.5
+  maxFallSpeed: 25
+  fastFallGravityMult: 2
+  maxFastFallSpeed: 30
+  runMaxSpeed: 8
+  runAcceleration: 2
+  runAccelAmount: 12.5
+  runDecceleration: 7
+  runDeccelAmount: 43.75
+  accelInAir: 0.664
+  deccelInAir: 0.668
+  doConserveMomentum: 0
+  jumpHeight: 3.3
+  jumpTimeToApex: 0.33
+  jumpForce: 20
+  jumpCutGravityMult: 2
+  jumpHangGravityMult: 0.4
+  jumpHangTimeThreshold: 1
+  jumpHangAccelerationMult: 1.2
+  jumpHangMaxSpeedMult: 1.3
+  wallJumpForce: {x: 11, y: 20}
+  wallJumpRunLerp: 0.024
+  wallJumpTime: 0.305
+  doTurnOnWallJump: 0
+  slideSpeed: -16
+  slideAccel: 12
+  coyoteTime: 0.1
+  jumpInputBufferTime: 0.25
+  shadowDashDelaySecond: 0.02
+  dashAmount: 1
+  dashSpeed: 27
+  dashSleepTime: 0.05
+  dashAttackTime: 0.15
+  dashEndTime: 0.15
+  dashEndSpeed: {x: 15, y: 15}
+  dashEndRunLerp: 0.5
+  dashRefillTime: 0.1
+  dashInputBufferTime: 0.05
