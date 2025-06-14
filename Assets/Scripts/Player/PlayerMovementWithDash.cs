@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour
     public PlayerDataWithDash Data;
 
     public static PlayerMovement Instance { get; private set; }
+    private PlayerControl playerControls;
 
     #region COMPONENTS
     [SerializeField] public Rigidbody2D RB;
@@ -87,8 +88,16 @@ public class PlayerMovement : MonoBehaviour
         {
             Destroy(gameObject); // Hủy nếu đã có instance khác
         }
+        playerControls = new PlayerControl();
+        playerControls.Enable();
     }
+    
 
+
+    private void OnDestroy()
+    {
+        playerControls.Disable();
+    }
     private void Start()
     {
         SetGravityScale(Data.gravityScale);
@@ -112,8 +121,8 @@ public class PlayerMovement : MonoBehaviour
         #endregion
 
         #region INPUT HANDLER
-        bool leftPressed = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
-        bool rightPressed = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
+        bool leftPressed = playerControls.Movement.Left.IsPressed();
+        bool rightPressed = playerControls.Movement.Right.IsPressed();;
 
         if (leftPressed && !_isLeftPressed)
         {
@@ -142,23 +151,33 @@ public class PlayerMovement : MonoBehaviour
         _isLeftPressed = leftPressed;
         _isRightPressed = rightPressed;
 
+        float verticalInput = 0f;
+        if (playerControls.Movement.Up.IsPressed())
+        {
+            verticalInput = 1f;
+        }
+        else if (playerControls.Movement.Down.IsPressed())
+        {
+            verticalInput = -1f;
+        }
+
         _moveInput.x = _lastPressedDirection;
-        _moveInput.y = Input.GetAxisRaw("Vertical");
+        _moveInput.y = verticalInput;
 
         if (_moveInput.x != 0)
             CheckDirectionToFace(_moveInput.x > 0);
 
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.J))
+        if (playerControls.Movement.Jump.WasPressedThisFrame()  || Input.GetKeyDown(KeyCode.Z))
         {
             OnJumpInput();
         }
 
-        if (Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.Z) || Input.GetKeyUp(KeyCode.J))
+        if (!playerControls.Movement.Jump.IsPressed())
         {
             OnJumpUpInput();
         }
 
-        if (Input.GetKeyDown(KeyCode.C) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.K))
+        if (playerControls.Movement.Dash.WasPressedThisFrame())
         {
             OnDashInput();
         }

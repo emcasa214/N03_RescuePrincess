@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 public class PlayerRespawn : MonoBehaviour
 {
     private Vector3 respawnPosition;
-    private static bool shouldPlayRespawnAnim = false; // Biến tĩnh để theo dõi trạng thái respawn
 
     [Header("Knockback Settings")]
     [SerializeField] private float knockbackMultiplier = 6f; // Độ mạnh của cú nảy
@@ -13,15 +12,15 @@ public class PlayerRespawn : MonoBehaviour
     [Header("Animation")]
     [SerializeField] private GameObject deadAnim;
     [SerializeField] private GameObject respawnAnim;
-    [SerializeField] private float delayEff = 51;
     [SerializeField] private GameObject transitionEffect;
+    [SerializeField] private GameObject retrans;
     private Rigidbody2D rb;
     private bool isRespawning = false;
-
+    
+    
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-
         GameObject respawnObject = GameObject.FindGameObjectWithTag("Respawn");
         if (respawnObject != null)
         {
@@ -33,11 +32,8 @@ public class PlayerRespawn : MonoBehaviour
             respawnPosition = transform.position;
         }
 
-        // Nếu cần chạy respawnAnim (sau khi tải scene)
-        if (shouldPlayRespawnAnim)
-        {
-            StartCoroutine(PlayRespawnOnStart());
-        }
+        // chạy respawnAnim (sau khi tải scene)
+        StartCoroutine(PlayRespawnOnStart());       
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -89,39 +85,40 @@ public class PlayerRespawn : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(70 / 60f); // Chờ hết deadAnim
         GameObject trans = Instantiate(transitionEffect, camPos, Quaternion.identity);
-        DontDestroyOnLoad(trans);
-        Destroy(trans, 90 / 60f);
-        yield return new WaitForSecondsRealtime(39 / 60f);
-        shouldPlayRespawnAnim = true; // Đánh dấu để chạy respawnAnim trong scene mới
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        yield return new WaitForSecondsRealtime(51/60f); 
+        yield return new WaitForSecondsRealtime(90 / 60f); // Chờ trans
+
+        yield return SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name); //chờ load xong scence
     }
 
     private IEnumerator PlayRespawnOnStart()
     {
 
         SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
+        Vector3 camPos = Camera.main.transform.position;
+        camPos.z += 1f;
         Color c = sr.color;
         c.a = 0f;
         sr.color = c;
         rb.simulated = false;
-        yield return new WaitForSecondsRealtime(delayEff/60f); 
+        GameObject trans1 = Instantiate(retrans, camPos, Quaternion.identity);
+        yield return new WaitForSecondsRealtime(70/60f);
+        Destroy(trans1);
         // Phát respawnAnim tại vị trí spawn
         GameObject respawn = Instantiate(respawnAnim, respawnPosition, Quaternion.identity);
         respawn.transform.localScale = transform.localScale;
         Destroy(respawn, 0.83f);
 
+        
+
+        yield return new WaitForSecondsRealtime(0.83f); // Chờ hết respawnAnim
         // Đặt vị trí player
         transform.position = respawnPosition;
         rb.velocity = Vector2.zero;
-
-        yield return new WaitForSecondsRealtime(0.83f); // Chờ hết respawnAnim
 
         // Khôi phục trạng thái
         rb.simulated = true;
         c.a = 1f;
         sr.color = c;
-        shouldPlayRespawnAnim = false;
         isRespawning = false;
     }
 }
