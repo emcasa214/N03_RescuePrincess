@@ -10743,12 +10743,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ae2675c8c03db04aa6b65654fe5fc30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mobileControls: {fileID: 2107312980}
-  fadeToBlack: 0
-  fadeFromBlack: 1
-  blackScreen: {fileID: 1647487284}
-  fadeSpeed: 2
-  playerController: {fileID: 0}
 --- !u!1 &1547273733
 GameObject:
   m_ObjectHideFlags: 0
@@ -10914,9 +10908,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eccbc272a5f6a894bbdb3971136bbfe7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerController: {fileID: 0}
-  levelCompletePanel: {fileID: 417105073}
-  leveCompletePanelTitle: {fileID: 515162515}
 --- !u!4 &1554447434
 Transform:
   m_ObjectHideFlags: 0
@@ -10990,24 +10981,6 @@ MonoBehaviour:
     m_DissipationDistance: 100
     m_PropagationSpeed: 343
   m_DefaultVelocity: {x: 0, y: 0, z: 0}
---- !u!114 &1583443335
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1583443330}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ad9f67ee92ea2441991bb4f8930b97e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  knockbackMultiplier: 6
-  deadAnim: {fileID: 0}
-  respawnAnim: {fileID: 0}
-  delayEff: 51
-  transitionEffect: {fileID: 0}
-  retrans: {fileID: 0}
 --- !u!1 &1647487282
 GameObject:
   m_ObjectHideFlags: 0
@@ -11426,9 +11399,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5267647101087183654, guid: bbe391a50d7f8a84fb6825e4a627a96c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1583443334}
-    - targetCorrespondingSourceObject: {fileID: 5267647101087183654, guid: bbe391a50d7f8a84fb6825e4a627a96c, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1583443335}
   m_SourcePrefab: {fileID: 100100000, guid: bbe391a50d7f8a84fb6825e4a627a96c, type: 3}
 --- !u!1001 &3856286472038835636
 PrefabInstance:
@@ -11694,7 +11664,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7012139579066110568, guid: 43c7ecf871b3e6c47b5e31bb7e705578, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -8.961182
+      value: -8.96242
       objectReference: {fileID: 0}
     - target: {fileID: 7012139579066110568, guid: 43c7ecf871b3e6c47b5e31bb7e705578, type: 3}
       propertyPath: m_LocalPosition.y
