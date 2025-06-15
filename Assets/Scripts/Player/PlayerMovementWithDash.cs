@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -57,6 +58,12 @@ public class PlayerMovement : MonoBehaviour
 
     #region INPUT PARAMETERS
     private Vector2 _moveInput;
+    private bool isJumpPressed;
+    private bool isDashPressed;
+    private bool isLeftressed;
+    private bool isRightPressed;
+    private bool isUpPressed;
+    private bool isDowmPressed;
 
     public float LastPressedJumpTime { get; private set; }
     public float LastPressedDashTime { get; private set; }
@@ -91,7 +98,7 @@ public class PlayerMovement : MonoBehaviour
         playerControls = new PlayerControl();
         playerControls.Enable();
     }
-    
+
 
 
     private void OnDestroy()
@@ -108,6 +115,72 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    public void OnJump(InputAction.CallbackContext ctxt)
+    {
+        if (ctxt.started)
+        {
+            OnJumpInput();
+        }
+        if (ctxt.canceled)
+        {
+            OnJumpUpInput();
+        } 
+    }
+
+    public void OnDash(InputAction.CallbackContext ctxt)
+    {
+        if (ctxt.started)
+        {
+            OnDashInput();
+        }
+    }
+    public void OnLeft(InputAction.CallbackContext ctxt)
+    {
+        if (ctxt.started)
+        {
+            isLeftressed = true;
+        }
+        if (ctxt.canceled)
+        {
+            isLeftressed = false;
+        } 
+    }
+
+    public void OnRight(InputAction.CallbackContext ctxt)
+    {
+        if (ctxt.started)
+        {
+            isRightPressed = true;
+        }
+        if (ctxt.canceled)
+        {
+            isRightPressed = false;
+        }
+    }
+
+    public void OnUp(InputAction.CallbackContext ctxt)
+    {
+        if (ctxt.started)
+        {
+            isUpPressed = true;
+        }
+        if (ctxt.canceled)
+        {
+            isUpPressed = false;
+        } 
+    }
+
+    public void OnDown(InputAction.CallbackContext ctxt)
+    {
+        if (ctxt.started)
+        {
+            isDowmPressed = true;
+        }
+        if (ctxt.canceled)
+        {
+            isDowmPressed = false;
+        } 
+    }
     private void Update()
     {
         #region TIMERS
@@ -121,8 +194,8 @@ public class PlayerMovement : MonoBehaviour
         #endregion
 
         #region INPUT HANDLER
-        bool leftPressed = playerControls.Movement.Left.IsPressed();
-        bool rightPressed = playerControls.Movement.Right.IsPressed();;
+        bool leftPressed = isLeftressed;
+        bool rightPressed = isRightPressed;
 
         if (leftPressed && !_isLeftPressed)
         {
@@ -152,11 +225,11 @@ public class PlayerMovement : MonoBehaviour
         _isRightPressed = rightPressed;
 
         float verticalInput = 0f;
-        if (playerControls.Movement.Up.IsPressed())
+        if (isUpPressed)
         {
             verticalInput = 1f;
         }
-        else if (playerControls.Movement.Down.IsPressed())
+        else if (isDowmPressed)
         {
             verticalInput = -1f;
         }
@@ -166,21 +239,6 @@ public class PlayerMovement : MonoBehaviour
 
         if (_moveInput.x != 0)
             CheckDirectionToFace(_moveInput.x > 0);
-
-        if (playerControls.Movement.Jump.WasPressedThisFrame()  || Input.GetKeyDown(KeyCode.Z))
-        {
-            OnJumpInput();
-        }
-
-        if (!playerControls.Movement.Jump.IsPressed())
-        {
-            OnJumpUpInput();
-        }
-
-        if (playerControls.Movement.Dash.WasPressedThisFrame())
-        {
-            OnDashInput();
-        }
         #endregion
 
         #region COLLISION CHECKS

@@ -261,7 +261,7 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
                 m_RebindOperation?.Dispose();
                 m_RebindOperation = null;
             }
-
+            action.Disable();
             // Configure the rebind.
             m_RebindOperation = action.PerformInteractiveRebinding(bindingIndex)
                 .OnCancel(
@@ -271,6 +271,7 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
                         m_RebindOverlay?.SetActive(false);
                         UpdateBindingDisplay();
                         CleanUp();
+                        action.Enable();
                     })
                 .OnComplete(
                     operation =>
@@ -279,7 +280,7 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
                         m_RebindStopEvent?.Invoke(this, operation);
                         UpdateBindingDisplay();
                         CleanUp();
-
+                        action.Enable();
                         // If there's more composite parts we should bind, initiate a rebind
                         // for the next part.
                         if (allCompositeParts)

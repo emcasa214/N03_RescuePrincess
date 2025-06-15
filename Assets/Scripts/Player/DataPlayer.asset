@@ -41,7 +41,7 @@ MonoBehaviour:
   slideSpeed: -16
   slideAccel: 12
   coyoteTime: 0.1
-  jumpInputBufferTime: 0.25
+  jumpInputBufferTime: 0.1
   shadowDashDelaySecond: 0.02
   dashAmount: 1
   dashSpeed: 27
