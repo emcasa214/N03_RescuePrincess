@@ -16,24 +16,16 @@ public class PlayerRespawn : MonoBehaviour
     [SerializeField] private GameObject retrans;
     private Rigidbody2D rb;
     private bool isRespawning = false;
-    
-    
+
+
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         GameObject respawnObject = GameObject.FindGameObjectWithTag("Respawn");
-        if (respawnObject != null)
-        {
-            respawnPosition = respawnObject.transform.position;
-        }
-        else
-        {
-            Debug.LogWarning("No object with tag 'Respawn' found. Using player's current position.");
-            respawnPosition = transform.position;
-        }
-
+        respawnPosition = respawnObject.transform.position;
+        
         // chạy respawnAnim (sau khi tải scene)
-        StartCoroutine(PlayRespawnOnStart());       
+        StartCoroutine(PlayRespawnOnStart());
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -86,13 +78,13 @@ public class PlayerRespawn : MonoBehaviour
         yield return new WaitForSecondsRealtime(70 / 60f); // Chờ hết deadAnim
         GameObject trans = Instantiate(transitionEffect, camPos, Quaternion.identity);
         yield return new WaitForSecondsRealtime(90 / 60f); // Chờ trans
-
         yield return SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name); //chờ load xong scence
     }
 
     private IEnumerator PlayRespawnOnStart()
     {
-
+        // yield return null;
+        
         SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
         Vector3 camPos = Camera.main.transform.position;
         camPos.z += 1f;
@@ -101,14 +93,14 @@ public class PlayerRespawn : MonoBehaviour
         sr.color = c;
         rb.simulated = false;
         GameObject trans1 = Instantiate(retrans, camPos, Quaternion.identity);
-        yield return new WaitForSecondsRealtime(70/60f);
+        yield return new WaitForSecondsRealtime(70 / 60f);
         Destroy(trans1);
         // Phát respawnAnim tại vị trí spawn
         GameObject respawn = Instantiate(respawnAnim, respawnPosition, Quaternion.identity);
         respawn.transform.localScale = transform.localScale;
         Destroy(respawn, 0.83f);
 
-        
+
 
         yield return new WaitForSecondsRealtime(0.83f); // Chờ hết respawnAnim
         // Đặt vị trí player

@@ -824,7 +824,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74ab99703724b7448aa04f7632e5ab93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offsetMultiplier: -0.9
+  offsetMultiplier: -0.2
   smoothTime: 0.6
 --- !u!212 &676580399
 SpriteRenderer:
@@ -1324,7 +1324,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74ab99703724b7448aa04f7632e5ab93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offsetMultiplier: -0.2
+  offsetMultiplier: -0.6
   smoothTime: 0.6
 --- !u!212 &1308437303
 SpriteRenderer:
@@ -1386,6 +1386,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2205652577863178691, guid: db8190659fb72a54baf589e50652d909, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 2205652577863178691, guid: db8190659fb72a54baf589e50652d909, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5220763822202151301, guid: db8190659fb72a54baf589e50652d909, type: 3}
+      propertyPath: ShapeModule.m_Scale.x
+      value: 25.3
+      objectReference: {fileID: 0}
     - target: {fileID: 6990544386005594883, guid: db8190659fb72a54baf589e50652d909, type: 3}
       propertyPath: m_Name
       value: Snow
@@ -1596,7 +1608,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74ab99703724b7448aa04f7632e5ab93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offsetMultiplier: -0.2
+  offsetMultiplier: -0.5
   smoothTime: 0.6
 --- !u!212 &1399189955
 SpriteRenderer:
@@ -1695,7 +1707,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74ab99703724b7448aa04f7632e5ab93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offsetMultiplier: -0.8
+  offsetMultiplier: -0.3
   smoothTime: 0.6
 --- !u!212 &1413794968
 SpriteRenderer:
@@ -1794,7 +1806,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74ab99703724b7448aa04f7632e5ab93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offsetMultiplier: -0.4
+  offsetMultiplier: -0.5
   smoothTime: 0.6
 --- !u!212 &1597668205
 SpriteRenderer:
@@ -1961,7 +1973,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74ab99703724b7448aa04f7632e5ab93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offsetMultiplier: -0.6
+  offsetMultiplier: -0.4
   smoothTime: 0.6
 --- !u!212 &1883565349
 SpriteRenderer:
