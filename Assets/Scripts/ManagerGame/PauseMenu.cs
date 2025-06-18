@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 public class PauseMenu : MonoBehaviour
 {
     public GameObject BindingMenu;
+    public GameObject mainMenu;
     private bool isPaused;
 
     // Start is called before the first frame update
@@ -31,7 +32,14 @@ public class PauseMenu : MonoBehaviour
             }
         }
     }
-
+    public void Options()
+    {
+        BindingMenu.SetActive(false);
+        if (mainMenu != null)
+        {
+            mainMenu.SetActive(true);
+        }
+    }
     public void onOk()
     {
         Time.timeScale = 1;

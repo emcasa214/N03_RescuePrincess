@@ -7,6 +7,13 @@ TagManager:
   - killzone
   - Coin
   - Ground
+  - Checkpoint
+  - MovingPlatform
+  - Boss
+  - OnWay
+  - ItemElec
+  - Weapon
+  - Strawberry
   layers:
   - Default
   - TransparentFX

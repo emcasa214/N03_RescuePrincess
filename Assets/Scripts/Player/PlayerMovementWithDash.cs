@@ -5,9 +5,9 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     public PlayerDataWithDash Data;
-
     public static PlayerMovement Instance { get; private set; }
     private PlayerControl playerControls;
+    private PlayerSound playerSound;
 
     #region COMPONENTS
     [SerializeField] public Rigidbody2D RB;
@@ -87,6 +87,8 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         RB = GetComponent<Rigidbody2D>();
+        playerSound = GetComponent<PlayerSound>();
+
         if (Instance == null)
         {
             Instance = this;
@@ -385,7 +387,8 @@ public class PlayerMovement : MonoBehaviour
         // Kiểm tra trạng thái "vừa chạm đất"
         if (!_wasOnGroundLastFrame && LastOnGroundTime > 0)
         {
-            playeranim.SetTrigger("land"); // Kích hoạt animation "land" khi vừa chạm đất
+            playeranim.SetTrigger("land"); // Kích hoạt animation "land" khi vừa chạm đấp
+            playerSound.PlayLand();
             PlayImpactEffect();
         }
 
@@ -542,6 +545,7 @@ public class PlayerMovement : MonoBehaviour
         _isJumpCut = false;
         _isJumpFalling = false;
         playeranim.SetTrigger("jump");
+        playerSound.PlayJump();
     }
     private void Jump()
     {
@@ -552,6 +556,7 @@ public class PlayerMovement : MonoBehaviour
         if (RB.velocity.y < 0)
             force -= RB.velocity.y;
         playeranim.SetTrigger("jump");
+        playerSound.PlayJump();
         RB.AddForce(Vector2.up * force, ForceMode2D.Impulse);
     }
 
@@ -580,6 +585,7 @@ public class PlayerMovement : MonoBehaviour
         if (RB.velocity.y < 0)
             force.y -= RB.velocity.y;
         playeranim.SetTrigger("jump");
+        playerSound.PlayJump();
         PlayImpactEffect();
         RB.AddForce(force, ForceMode2D.Impulse);
     }
@@ -587,10 +593,8 @@ public class PlayerMovement : MonoBehaviour
     //landed effect
     void PlayImpactEffect()
     {
-        // if (!ImpactEffect.isPlaying)
-        // {
         ImpactEffect.Play();
-        // }
+        
     }
 
     #endregion
@@ -606,6 +610,7 @@ public class PlayerMovement : MonoBehaviour
         _dashesLeft--;
         _isDashAttacking = true;
         StartDashEffect();
+        playerSound.PlayDash();
         SetGravityScale(0);
         while (Time.time - startTime <= Data.dashAttackTime)
         {
