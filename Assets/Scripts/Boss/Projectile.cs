@@ -8,6 +8,7 @@ public class Projectile : MonoBehaviour
     public float speed;
     public float closeDistance = 0.1f; // Khoảng cách tối thiểu để coi là "trúng"
     public GameObject explosion;
+    public GameObject explosionCollect;
     public GameObject explosionTwo;
     // private Animator camAnim;
     private Transform target; // Tham chiếu đến boss
@@ -17,6 +18,9 @@ public class Projectile : MonoBehaviour
         // camAnim = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Animator>();
         // Tìm boss khi đạn được tạo
         target = GameObject.FindGameObjectWithTag("Boss")?.transform;
+        // Tạo hiệu ứng nổ tại vị trí đạn được sinh ra
+        GameObject expCol = Instantiate(explosionCollect, transform.position, Quaternion.identity);
+        Destroy(expCol, 5 / 60f);
         // Tự hủy sau 5 giây nếu không trúng
         Destroy(gameObject, 5.0f);
     }

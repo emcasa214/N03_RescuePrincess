@@ -193,6 +193,7 @@ public class PlayerRespawn : MonoBehaviour
     private int tempItemCount = 0;
     private int displayedStrawberryCount = 0;
     private GameObject respawnObject;
+    
 
     private void Awake()
     {
@@ -243,6 +244,7 @@ public class PlayerRespawn : MonoBehaviour
             }
             StartCoroutine(AnimateStrawberryCount(displayedStrawberryCount, CheckpointData.GetTotalStrawberries()));
             SaveGame(); // Lưu trạng thái ngay khi đạt checkpoint
+            playerSound.PlayCheckPoint();
         }
 
         if (collision.CompareTag("Strawberry"))
@@ -255,9 +257,9 @@ public class PlayerRespawn : MonoBehaviour
                 collision.gameObject.SetActive(false);
                 StartCoroutine(AnimateStrawberryCount(displayedStrawberryCount, displayedStrawberryCount + 1));
                 displayedStrawberryCount++;
-                CheckpointData.SaveItem(itemName); // Lưu dâu tây ngay khi nhặt
-                SaveGame(); // Lưu trạng thái sau khi nhặt dâu tây
             }
+            playerSound.PlayCollect();
+
         }
     }
 

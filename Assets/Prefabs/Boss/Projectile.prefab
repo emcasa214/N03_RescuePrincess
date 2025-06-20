@@ -137,4 +137,5 @@ MonoBehaviour:
   speed: 80
   closeDistance: 0.1
   explosion: {fileID: 1900874806143164, guid: a17c747136dd2604899d262109239dff, type: 3}
+  explosionCollect: {fileID: 8194343473064419417, guid: 76c941c8c2b8ad647a0dc1d780f7d46e, type: 3}
   explosionTwo: {fileID: 1214371818292734, guid: 4d0e5f54256a59949aec59514c116c3b, type: 3}

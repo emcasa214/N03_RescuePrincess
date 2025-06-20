@@ -9,8 +9,12 @@ public class Weapon : MonoBehaviour
     public Transform shotPoint;
 
     public int rotationOffset;
+    private PlayerSound playerSound;
 
-
+    public void Start()
+    {
+        playerSound = GetComponentInParent<PlayerSound>();
+    }
     private void Update()
     {
         GameObject boss = GameObject.FindGameObjectWithTag("Boss");
@@ -25,7 +29,7 @@ public class Weapon : MonoBehaviour
 
         {
             Instantiate(projectile, shotPoint.position, transform.rotation);
-         
+            playerSound.PlayAttack();
         }
     }
 }

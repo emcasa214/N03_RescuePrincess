@@ -14,6 +14,7 @@ TagManager:
   - ItemElec
   - Weapon
   - Strawberry
+  - Win
   layers:
   - Default
   - TransparentFX

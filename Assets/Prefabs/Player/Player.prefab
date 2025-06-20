@@ -10602,6 +10602,9 @@ MonoBehaviour:
   deathSound: {fileID: 8300000, guid: e68af28a177cd10448a7f3ee6a7fcea5, type: 3}
   deathPre: {fileID: 8300000, guid: 8c995a1d191418341918afc00384afdd, type: 3}
   respawn: {fileID: 8300000, guid: f00236fa7de55c544a8891a81a771e9e, type: 3}
+  strawberry: {fileID: 8300000, guid: a3551633c753f174283ec9419016dcbe, type: 3}
+  attack: {fileID: 8300000, guid: 6ef634530becee94697ed2c6406e532a, type: 3}
+  checkPoint: {fileID: 8300000, guid: 835136a0c9786a74d9955c3882223fa9, type: 3}
   landVolume: 0.6
   jumpVolume: 1
 --- !u!82 &2115374754991953833
@@ -11006,6 +11009,30 @@ PrefabInstance:
     - target: {fileID: 5153451510108500355, guid: 355ee48955658cc408ddc73f8bf0faec, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: onOk
+      objectReference: {fileID: 0}
+    - target: {fileID: 5729877071140196548, guid: 355ee48955658cc408ddc73f8bf0faec, type: 3}
+      propertyPath: m_Value
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5729877071140196548, guid: 355ee48955658cc408ddc73f8bf0faec, type: 3}
+      propertyPath: m_MaxValue
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5729877071140196548, guid: 355ee48955658cc408ddc73f8bf0faec, type: 3}
+      propertyPath: m_MinValue
+      value: -10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6060190712402315111, guid: 355ee48955658cc408ddc73f8bf0faec, type: 3}
+      propertyPath: m_Value
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6060190712402315111, guid: 355ee48955658cc408ddc73f8bf0faec, type: 3}
+      propertyPath: m_MaxValue
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6060190712402315111, guid: 355ee48955658cc408ddc73f8bf0faec, type: 3}
+      propertyPath: m_MinValue
+      value: -10
       objectReference: {fileID: 0}
     - target: {fileID: 6329591316714973713, guid: 355ee48955658cc408ddc73f8bf0faec, type: 3}
       propertyPath: m_AnchoredPosition.x
