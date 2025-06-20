@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using System.Collections;
 using TMPro;
+using System;
 
 public static class CheckpointData
 {
@@ -11,60 +12,80 @@ public static class CheckpointData
     private static Dictionary<string, List<string>> collectedItems = new Dictionary<string, List<string>>();
     private static Dictionary<string, int> itemCounts = new Dictionary<string, int>();
     private static int totalStrawberries = 0;
+    private static string currentScene = "";
+    private static HashSet<string> savedScenes = new HashSet<string>();
 
-    public static void SaveCheckpoint(string sceneName, Vector3 position)
+    public static void SetCurrentScene(string sceneName)
     {
-        if (!checkpoints.ContainsKey(sceneName))
+        currentScene = sceneName;
+    }
+
+    public static string GetCurrentScene()
+    {
+        return currentScene;
+    }
+
+    public static void SaveCheckpoint(Vector3 position)
+    {
+        if (string.IsNullOrEmpty(currentScene))
+            return;
+
+        if (!checkpoints.ContainsKey(currentScene))
         {
-            checkpoints[sceneName] = new List<Vector3>();
+            checkpoints[currentScene] = new List<Vector3>();
         }
-        checkpoints[sceneName].Add(position); // Luôn thêm vị trí checkpoint mới nhất
+        checkpoints[currentScene].Add(position);
+        savedScenes.Add(currentScene); // Theo dõi scene đã được lưu
     }
 
-    public static bool HasCheckpoint(string sceneName)
+    public static bool HasCheckpoint()
     {
-        return checkpoints.ContainsKey(sceneName) && checkpoints[sceneName].Count > 0;
+        return checkpoints.ContainsKey(currentScene) && checkpoints[currentScene].Count > 0;
     }
 
-    public static Vector3 GetLastCheckpoint(string sceneName)
+    public static Vector3 GetLastCheckpoint()
     {
-        if (HasCheckpoint(sceneName))
+        if (HasCheckpoint())
         {
-            return checkpoints[sceneName][checkpoints[sceneName].Count - 1];
+            return checkpoints[currentScene][checkpoints[currentScene].Count - 1];
         }
         return Vector3.zero;
     }
 
-    public static void ClearCheckpoint(string sceneName)
+    public static void ClearCheckpoint()
     {
-        if (checkpoints.ContainsKey(sceneName))
-            checkpoints.Remove(sceneName);
-        if (collectedItems.ContainsKey(sceneName))
-            collectedItems.Remove(sceneName);
-        if (itemCounts.ContainsKey(sceneName))
-            itemCounts.Remove(sceneName);
+        if (checkpoints.ContainsKey(currentScene))
+            checkpoints.Remove(currentScene);
+        if (collectedItems.ContainsKey(currentScene))
+            collectedItems.Remove(currentScene);
+        if (itemCounts.ContainsKey(currentScene))
+            itemCounts.Remove(currentScene);
+        savedScenes.Remove(currentScene);
     }
 
-    public static void SaveItem(string sceneName, string itemName)
+    public static void SaveItem(string itemName)
     {
-        if (!collectedItems.ContainsKey(sceneName))
-            collectedItems[sceneName] = new List<string>();
-        if (!collectedItems[sceneName].Contains(itemName))
+        if (string.IsNullOrEmpty(currentScene))
+            return;
+
+        if (!collectedItems.ContainsKey(currentScene))
+            collectedItems[currentScene] = new List<string>();
+        if (!collectedItems[currentScene].Contains(itemName))
         {
-            collectedItems[sceneName].Add(itemName);
-            itemCounts[sceneName] = collectedItems[sceneName].Count;
+            collectedItems[currentScene].Add(itemName);
+            itemCounts[currentScene] = collectedItems[currentScene].Count;
             totalStrawberries++;
         }
     }
 
-    public static List<string> GetCollectedItems(string sceneName)
+    public static List<string> GetCollectedItems()
     {
-        return collectedItems.ContainsKey(sceneName) ? collectedItems[sceneName] : new List<string>();
+        return collectedItems.ContainsKey(currentScene) ? collectedItems[currentScene] : new List<string>();
     }
 
-    public static int GetItemCount(string sceneName)
+    public static int GetItemCount()
     {
-        return itemCounts.ContainsKey(sceneName) ? itemCounts[sceneName] : 0;
+        return itemCounts.ContainsKey(currentScene) ? itemCounts[currentScene] : 0;
     }
 
     public static int GetTotalStrawberries()
@@ -72,9 +93,77 @@ public static class CheckpointData
         return totalStrawberries;
     }
 
-    public static void ResetTotalStrawberries()
+    public static void SaveGameState()
     {
+        if (string.IsNullOrEmpty(currentScene))
+            return;
+
+        PlayerPrefs.SetString("LastScene", currentScene); // Lưu scene cuối cùng
+        PlayerPrefs.SetString("SavedScenes", string.Join(",", savedScenes)); // Lưu danh sách các scene đã lưu
+
+        // Lưu trạng thái của scene hiện tại
+        if (HasCheckpoint())
+        {
+            Vector3 lastCheckpoint = GetLastCheckpoint();
+            PlayerPrefs.SetFloat(currentScene + "_CheckpointX", lastCheckpoint.x);
+            PlayerPrefs.SetFloat(currentScene + "_CheckpointY", lastCheckpoint.y);
+            PlayerPrefs.SetFloat(currentScene + "_CheckpointZ", lastCheckpoint.z);
+        }
+        string items = string.Join(",", GetCollectedItems());
+        PlayerPrefs.SetString(currentScene + "_CollectedItems", items);
+        PlayerPrefs.SetInt(currentScene + "_ItemCount", GetItemCount());
+
+        // Lưu tổng số dâu tây
+        PlayerPrefs.SetInt("TotalStrawberries", totalStrawberries);
+        PlayerPrefs.Save();
+    }
+
+    public static void LoadGameState()
+    {
+        if (string.IsNullOrEmpty(currentScene))
+            return;
+
+        // Tải danh sách các scene đã lưu
+        string savedScenesStr = PlayerPrefs.GetString("SavedScenes", "");
+        if (!string.IsNullOrEmpty(savedScenesStr))
+        {
+            savedScenes = new HashSet<string>(savedScenesStr.Split(','));
+        }
+
+        // Tải trạng thái cho scene hiện tại
+        if (PlayerPrefs.HasKey(currentScene + "_CheckpointX"))
+        {
+            Vector3 position = new Vector3(
+                PlayerPrefs.GetFloat(currentScene + "_CheckpointX"),
+                PlayerPrefs.GetFloat(currentScene + "_CheckpointY"),
+                PlayerPrefs.GetFloat(currentScene + "_CheckpointZ")
+            );
+            SaveCheckpoint(position);
+        }
+        string items = PlayerPrefs.GetString(currentScene + "_CollectedItems", "");
+        if (!string.IsNullOrEmpty(items))
+        {
+            collectedItems[currentScene] = new List<string>(items.Split(','));
+            itemCounts[currentScene] = collectedItems[currentScene].Count;
+        }
+        totalStrawberries = PlayerPrefs.GetInt("TotalStrawberries", 0);
+    }
+
+    public static bool HasSavedGame()
+    {
+        return PlayerPrefs.HasKey("LastScene");
+    }
+
+    public static void ClearAllData()
+    {
+        checkpoints.Clear();
+        collectedItems.Clear();
+        itemCounts.Clear();
         totalStrawberries = 0;
+        currentScene = "";
+        savedScenes.Clear();
+        PlayerPrefs.DeleteAll();
+        PlayerPrefs.Save();
     }
 }
 
@@ -93,6 +182,8 @@ public class PlayerRespawn : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI itemCountText;
+    [SerializeField] private Button saveButton;
+    [SerializeField] private Button continueButton;
 
     private Rigidbody2D rb;
     private bool isRespawning = false;
@@ -101,6 +192,7 @@ public class PlayerRespawn : MonoBehaviour
     private List<string> tempCollectedItems = new List<string>();
     private int tempItemCount = 0;
     private int displayedStrawberryCount = 0;
+    private GameObject respawnObject;
 
     private void Awake()
     {
@@ -109,18 +201,22 @@ public class PlayerRespawn : MonoBehaviour
 
     private void Start()
     {
+        respawnObject = GameObject.FindGameObjectWithTag("Respawn");
         rb = GetComponent<Rigidbody2D>();
         currentScene = SceneManager.GetActiveScene().name;
+        CheckpointData.SetCurrentScene(currentScene);
 
-        if (CheckpointData.HasCheckpoint(currentScene))
+        // Tải trạng thái cho scene hiện tại, bất kể có phải scene cuối cùng hay không
+        CheckpointData.LoadGameState();
+
+        if (CheckpointData.HasCheckpoint())
         {
-            respawnPosition = CheckpointData.GetLastCheckpoint(currentScene);
-            tempItemCount = CheckpointData.GetItemCount(currentScene);
-            tempCollectedItems = new List<string>(CheckpointData.GetCollectedItems(currentScene));
+            respawnPosition = CheckpointData.GetLastCheckpoint();
+            tempItemCount = CheckpointData.GetItemCount();
+            tempCollectedItems = new List<string>(CheckpointData.GetCollectedItems());
         }
         else
         {
-            GameObject respawnObject = GameObject.FindGameObjectWithTag("Respawn");
             respawnPosition = respawnObject != null ? respawnObject.transform.position : transform.position;
             tempItemCount = 0;
             tempCollectedItems.Clear();
@@ -140,12 +236,13 @@ public class PlayerRespawn : MonoBehaviour
 
         if (collision.CompareTag("Checkpoint"))
         {
-            CheckpointData.SaveCheckpoint(currentScene, collision.transform.position);
+            CheckpointData.SaveCheckpoint(collision.transform.position);
             foreach (string item in tempCollectedItems)
             {
-                CheckpointData.SaveItem(currentScene, item);
+                CheckpointData.SaveItem(item);
             }
             StartCoroutine(AnimateStrawberryCount(displayedStrawberryCount, CheckpointData.GetTotalStrawberries()));
+            SaveGame(); // Lưu trạng thái ngay khi đạt checkpoint
         }
 
         if (collision.CompareTag("Strawberry"))
@@ -158,6 +255,8 @@ public class PlayerRespawn : MonoBehaviour
                 collision.gameObject.SetActive(false);
                 StartCoroutine(AnimateStrawberryCount(displayedStrawberryCount, displayedStrawberryCount + 1));
                 displayedStrawberryCount++;
+                CheckpointData.SaveItem(itemName); // Lưu dâu tây ngay khi nhặt
+                SaveGame(); // Lưu trạng thái sau khi nhặt dâu tây
             }
         }
     }
@@ -196,7 +295,7 @@ public class PlayerRespawn : MonoBehaviour
         {
             knockback = -currentVelocity.normalized * knockbackMultiplier;
         }
-        playerSound.PlayDeath();
+        playerSound.PlayPreDeath();
         rb.velocity = Vector2.zero;
         rb.AddForce(knockback, ForceMode2D.Impulse);
         yield return new WaitForSeconds(0.1f);
@@ -223,8 +322,8 @@ public class PlayerRespawn : MonoBehaviour
         GameObject trans = Instantiate(transitionEffect, camPos, Quaternion.identity);
         yield return new WaitForSecondsRealtime(90 / 60f);
 
-        tempCollectedItems = new List<string>(CheckpointData.GetCollectedItems(currentScene));
-        tempItemCount = CheckpointData.GetItemCount(currentScene);
+        tempCollectedItems = new List<string>(CheckpointData.GetCollectedItems());
+        tempItemCount = CheckpointData.GetItemCount();
         displayedStrawberryCount = CheckpointData.GetTotalStrawberries();
         UpdateItemCountUI();
 
@@ -265,6 +364,7 @@ public class PlayerRespawn : MonoBehaviour
         Destroy(trans1);
 
         GameObject respawn = Instantiate(respawnAnim, respawnPosition, Quaternion.identity);
+        playerSound.PlayRespawn();
         respawn.transform.localScale = transform.localScale;
         Destroy(respawn, 0.83f);
 
@@ -275,4 +375,21 @@ public class PlayerRespawn : MonoBehaviour
         sr.color = c;
         isRespawning = false;
     }
+
+    public void Restart()
+    {
+        CheckpointData.ClearCheckpoint();
+        tempCollectedItems.Clear();
+        tempItemCount = 0;
+        displayedStrawberryCount = CheckpointData.GetTotalStrawberries();
+        UpdateItemCountUI();
+        SceneManager.LoadScene(currentScene);
+    }
+
+    public void SaveGame()
+    {
+        CheckpointData.SaveGameState();
+    }
+
+    
 }

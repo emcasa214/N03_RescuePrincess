@@ -7,6 +7,9 @@ public class PlayerSound : MonoBehaviour
     public AudioClip landSound;
     public AudioClip dashSound;
     public AudioClip deathSound;
+    public AudioClip deathPre;
+    public AudioClip respawn;
+
     [Header("Volumes")]
     public float landVolume = 0.7f;
     public float jumpVolume = 0.7f;
@@ -21,9 +24,10 @@ public class PlayerSound : MonoBehaviour
     public void PlayLand() => PlaySound(landSound, landVolume);
 
     public void PlayJump() => PlaySound(jumpSound, jumpVolume);
-    public void PlayDash() => PlaySound(dashSound);
-
+    public void PlayDash() => PlaySound(dashSound,0.5f);
     public void PlayDeath() => PlaySound(deathSound);
+    public void PlayPreDeath() => PlaySound(deathPre);
+    public void PlayRespawn() => PlaySound(respawn);
 
     private void PlaySound(AudioClip clip, float volume = 1f)
     {

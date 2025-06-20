@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class PauseMenu : MonoBehaviour
 {
     public GameObject BindingMenu;
     public GameObject mainMenu;
     private bool isPaused;
+    
 
     // Start is called before the first frame update
     void Start()
@@ -35,10 +37,10 @@ public class PauseMenu : MonoBehaviour
     public void Options()
     {
         BindingMenu.SetActive(false);
-        if (mainMenu != null)
-        {
-            mainMenu.SetActive(true);
-        }
+        CanvasGroup canvasGroup = mainMenu.GetComponent<CanvasGroup>();
+        canvasGroup.alpha = 1f; 
+        canvasGroup.blocksRaycasts = true; 
+        canvasGroup.interactable = true; 
     }
     public void onOk()
     {
@@ -46,6 +48,19 @@ public class PauseMenu : MonoBehaviour
         BindingMenu.SetActive(false);
     }
 
+    public void Restart()
+    {
+        Time.timeScale = 1;
+        BindingMenu.SetActive(false);
+    }
+
+    public void BackMenu()
+    {
+        Time.timeScale = 1;
+        // Debug.Log($"Saving before returning to MainMenu from {currentScene}");
+        // CheckpointData.SaveProgress(currentScene);
+        SceneManager.LoadScene("Menu");
+    }
     // Update is called once per frame
     void Update()
     {
