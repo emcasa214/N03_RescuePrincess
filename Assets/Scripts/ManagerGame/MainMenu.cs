@@ -3,10 +3,25 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
+    public static MainMenu Instance { get; private set; }
     [SerializeField] private GameObject settingMenu;
     [SerializeField] private GameObject mainMenu;
     [SerializeField] private GameObject continueButton;
-
+    private void Start()
+    {
+        if (!CheckpointData.HasSavedGame())
+        {
+            continueButton.SetActive(false);
+        }
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
     public void Quit()
     {
         Application.Quit();
@@ -14,29 +29,15 @@ public class MainMenu : MonoBehaviour
 
     public void Options()
     {
-        settingMenu.SetActive(true);
-        CanvasGroup canvasGroup = mainMenu.GetComponent<CanvasGroup>();
-        canvasGroup.alpha = 0f; // Làm Canvas trong suốt
-        canvasGroup.blocksRaycasts = false; // (Tùy chọn) Ngăn chặn raycast (click, hover)
-        canvasGroup.interactable = false;   // (Tùy chọn) Ngăn chặn tương tác
-    }
-    private void Start()
-    {
-        if (!CheckpointData.HasSavedGame())
-        {
-            continueButton.SetActive(false);
-        }
+        EnableMenu(settingMenu);
+        DisableMenu(mainMenu);
     }
 
     public void Play()
     {
-        // Xóa tất cả dữ liệu trong PlayerPrefs
-        PlayerPrefs.DeleteAll();
-        PlayerPrefs.Save();
-
-        // Reset trạng thái trong CheckpointData
+        
         CheckpointData.ClearAllData();
-
+        PlayerPrefs.DeleteAll(); // Xóa tất cả dữ liệu đã lưu
         // Load scene mặc định để bắt đầu game mới
         SceneManager.LoadScene("Level");
     }
@@ -69,5 +70,20 @@ public class MainMenu : MonoBehaviour
     public void Update()
     {
 
+    }
+
+    public void DisableMenu(GameObject menuName)
+    {
+        CanvasGroup canvasGroup = menuName.GetComponent<CanvasGroup>();
+        canvasGroup.alpha = 0f; // Làm Canvas trong suốt
+        canvasGroup.blocksRaycasts = false; // Ngăn chặn raycast (click, hover)
+        canvasGroup.interactable = false;   // Ngăn chặn tương tác
+    }
+    public void EnableMenu(GameObject menuName)
+    {
+        CanvasGroup canvasGroup = menuName.GetComponent<CanvasGroup>();
+        canvasGroup.alpha = 1f; // Làm Canvas hiển thị
+        canvasGroup.blocksRaycasts = true; // Cho phép raycast (click, hover)
+        canvasGroup.interactable = true;   // Cho phép tương tác
     }
 }

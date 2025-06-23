@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6793472382201712316}
   - component: {fileID: 349384052871921192}
   - component: {fileID: 947979559792522197}
+  - component: {fileID: 1883699640286139035}
   m_Layer: 0
   m_Name: StrawberryFlap
   m_TagString: Strawberry
@@ -142,3 +143,15 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.07486743
+--- !u!114 &1883699640286139035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8673592060111223859}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d68911ba404138c4cbfb81374f129096, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

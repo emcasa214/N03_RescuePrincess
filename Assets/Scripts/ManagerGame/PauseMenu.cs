@@ -9,7 +9,7 @@ public class PauseMenu : MonoBehaviour
     public GameObject BindingMenu;
     public GameObject mainMenu;
     private bool isPaused;
-    
+
 
     // Start is called before the first frame update
     void Start()
@@ -25,40 +25,35 @@ public class PauseMenu : MonoBehaviour
             if (isPaused)
             {
                 Time.timeScale = 0;
-                BindingMenu.SetActive(true);
+                MainMenu.Instance.EnableMenu(BindingMenu);
             }
             else
             {
                 Time.timeScale = 1;
-                BindingMenu.SetActive(false);
+                MainMenu.Instance.DisableMenu(BindingMenu);
             }
         }
     }
     public void Options()
     {
-        BindingMenu.SetActive(false);
-        CanvasGroup canvasGroup = mainMenu.GetComponent<CanvasGroup>();
-        canvasGroup.alpha = 1f; 
-        canvasGroup.blocksRaycasts = true; 
-        canvasGroup.interactable = true; 
+        MainMenu.Instance.DisableMenu(BindingMenu);
+        MainMenu.Instance.EnableMenu(mainMenu);
     }
     public void onOk()
     {
         Time.timeScale = 1;
-        BindingMenu.SetActive(false);
+        MainMenu.Instance.DisableMenu(BindingMenu);
     }
 
     public void Restart()
     {
         Time.timeScale = 1;
-        BindingMenu.SetActive(false);
+        MainMenu.Instance.DisableMenu(BindingMenu);
     }
 
     public void BackMenu()
     {
         Time.timeScale = 1;
-        // Debug.Log($"Saving before returning to MainMenu from {currentScene}");
-        // CheckpointData.SaveProgress(currentScene);
         SceneManager.LoadScene("Menu");
     }
     // Update is called once per frame

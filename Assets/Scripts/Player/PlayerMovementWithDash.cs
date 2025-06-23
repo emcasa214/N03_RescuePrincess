@@ -15,7 +15,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private GameObject shadowDash;
     [SerializeField] private ParticleSystem ImpactEffect;
     [SerializeField] private SpriteRenderer sr;
-
     [SerializeField] private Camera mainCamera;
     #endregion
 
@@ -52,8 +51,13 @@ public class PlayerMovement : MonoBehaviour
     public int facingLockFrames;
     private int _facingLockFrames;
 
-    // Thêm biến để lưu trạng thái chạm đất của khung hình trước
     private bool _wasOnGroundLastFrame;
+
+    // Biến để theo dõi chạm đất lần đầu
+    private bool _hasTouchedGround;
+    // Material Property Block để điều khiển shader
+    private MaterialPropertyBlock _propertyBlock;
+    private bool _isColorReplacementEnabled;
     #endregion
 
     #region INPUT PARAMETERS
@@ -95,13 +99,14 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            Destroy(gameObject); // Hủy nếu đã có instance khác
+            Destroy(gameObject);
         }
         playerControls = new PlayerControl();
         playerControls.Enable();
+
+        // Khởi tạo MaterialPropertyBlock
+        _propertyBlock = new MaterialPropertyBlock();
     }
-
-
 
     private void OnDestroy()
     {
@@ -109,11 +114,26 @@ public class PlayerMovement : MonoBehaviour
     }
     private void Start()
     {
+        
         SetGravityScale(Data.gravityScale);
         IsFacingRight = true;
         if (mainCamera == null)
         {
             mainCamera = Camera.main;
+        }
+        _dashesLeft = Data.dashAmount;
+        _hasTouchedGround = false;
+
+        // Đảm bảo SpriteRenderer sử dụng material với ColorReplaceShader
+        if (sr != null)
+        {
+            // Đặt sprite trong suốt (alpha = 0) khi load scene
+            sr.color = new Color(0f,0f,0f, 0f);
+
+            sr.GetPropertyBlock(_propertyBlock);
+            _propertyBlock.SetFloat("_EnableReplacement", 0);
+            sr.SetPropertyBlock(_propertyBlock);
+            _isColorReplacementEnabled = false;
         }
     }
 
@@ -126,7 +146,7 @@ public class PlayerMovement : MonoBehaviour
         if (ctxt.canceled)
         {
             OnJumpUpInput();
-        } 
+        }
     }
 
     public void OnDash(InputAction.CallbackContext ctxt)
@@ -136,6 +156,7 @@ public class PlayerMovement : MonoBehaviour
             OnDashInput();
         }
     }
+
     public void OnLeft(InputAction.CallbackContext ctxt)
     {
         if (ctxt.started)
@@ -145,7 +166,7 @@ public class PlayerMovement : MonoBehaviour
         if (ctxt.canceled)
         {
             isLeftressed = false;
-        } 
+        }
     }
 
     public void OnRight(InputAction.CallbackContext ctxt)
@@ -169,7 +190,7 @@ public class PlayerMovement : MonoBehaviour
         if (ctxt.canceled)
         {
             isUpPressed = false;
-        } 
+        }
     }
 
     public void OnDown(InputAction.CallbackContext ctxt)
@@ -181,8 +202,9 @@ public class PlayerMovement : MonoBehaviour
         if (ctxt.canceled)
         {
             isDowmPressed = false;
-        } 
+        }
     }
+
     private void Update()
     {
         #region TIMERS
@@ -249,6 +271,8 @@ public class PlayerMovement : MonoBehaviour
             if (Physics2D.OverlapBox(_groundCheckPoint.position, _groundCheckSize, 0, _groundLayer) && !IsJumping)
             {
                 LastOnGroundTime = Data.coyoteTime;
+                // Đặt _hasTouchedGround thành true khi chạm đất lần đầu
+                _hasTouchedGround = true;
             }
 
             if (((Physics2D.OverlapBox(_frontWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) && IsFacingRight)
@@ -310,15 +334,14 @@ public class PlayerMovement : MonoBehaviour
         if (CanDash() && LastPressedDashTime > 0)
         {
             Sleep(Data.dashSleepTime);
-            _dashMoveInputBufferTime = Data.dashInputBufferTime; // Bắt đầu thời gian chờ input di chuyển
+            _dashMoveInputBufferTime = Data.dashInputBufferTime;
             if (_moveInput != Vector2.zero)
             {
-                // Ưu tiên hướng chéo nếu cả hai trục được nhấn
-                _lastDashDir = _moveInput.normalized; // Chuẩn hóa để đảm bảo hướng chéo
+                _lastDashDir = _moveInput.normalized;
             }
             else
             {
-                _lastDashDir = IsFacingRight ? Vector2.right : Vector2.left; // Mặc định theo hướng nhân vật
+                _lastDashDir = IsFacingRight ? Vector2.right : Vector2.left;
             }
 
             IsDashing = true;
@@ -328,13 +351,30 @@ public class PlayerMovement : MonoBehaviour
             StartCoroutine(nameof(StartDash), _lastDashDir);
         }
 
-        // Cập nhật hướng dash trong thời gian buffer
         if (_dashMoveInputBufferTime > 0)
         {
             _dashMoveInputBufferTime -= Time.deltaTime;
             if (_moveInput != Vector2.zero)
             {
-                _lastDashDir = _moveInput.normalized; // Cập nhật hướng dựa trên input mới, ưu tiên chéo
+                _lastDashDir = _moveInput.normalized;
+            }
+        }
+
+        // Cập nhật thay thế màu dựa trên CanDash(), chỉ sau khi chạm đất lần đầu
+        if (_hasTouchedGround && sr != null)
+        {
+            bool canDash = CanDash();
+            if (canDash && _isColorReplacementEnabled)
+            {
+                _propertyBlock.SetFloat("_EnableReplacement", 0);
+                sr.SetPropertyBlock(_propertyBlock);
+                _isColorReplacementEnabled = false;
+            }
+            else if (!canDash && !_isColorReplacementEnabled)
+            {
+                _propertyBlock.SetFloat("_EnableReplacement", 1);
+                sr.SetPropertyBlock(_propertyBlock);
+                _isColorReplacementEnabled = true;
             }
         }
         #endregion
@@ -384,10 +424,9 @@ public class PlayerMovement : MonoBehaviour
         #endregion
 
         #region Fall and Land Animation
-        // Kiểm tra trạng thái "vừa chạm đất"
         if (!_wasOnGroundLastFrame && LastOnGroundTime > 0)
         {
-            playeranim.SetTrigger("land"); // Kích hoạt animation "land" khi vừa chạm đấp
+            playeranim.SetTrigger("land");
             playerSound.PlayLand();
             PlayImpactEffect();
         }
@@ -419,10 +458,8 @@ public class PlayerMovement : MonoBehaviour
             playeranim.SetBool("fall", false);
         }
 
-        // Lưu trạng thái chạm đất cho khung hình tiếp theo
         _wasOnGroundLastFrame = LastOnGroundTime > 0;
         #endregion
-
     }
 
     private void FixedUpdate()
@@ -538,7 +575,6 @@ public class PlayerMovement : MonoBehaviour
     #endregion
 
     #region JUMP METHODS
-
     public void JumpPadState()
     {
         IsJumping = true;
@@ -546,7 +582,9 @@ public class PlayerMovement : MonoBehaviour
         _isJumpFalling = false;
         playeranim.SetTrigger("jump");
         playerSound.PlayJump();
+        
     }
+
     private void Jump()
     {
         LastPressedJumpTime = 0;
@@ -590,13 +628,10 @@ public class PlayerMovement : MonoBehaviour
         RB.AddForce(force, ForceMode2D.Impulse);
     }
 
-    //landed effect
     void PlayImpactEffect()
     {
         ImpactEffect.Play();
-        
     }
-
     #endregion
 
     #region DASH METHODS
@@ -612,9 +647,12 @@ public class PlayerMovement : MonoBehaviour
         StartDashEffect();
         playerSound.PlayDash();
         SetGravityScale(0);
+
+        
+
         while (Time.time - startTime <= Data.dashAttackTime)
         {
-            RB.velocity = _lastDashDir.normalized * Data.dashSpeed; // Sử dụng _lastDashDir
+            RB.velocity = _lastDashDir.normalized * Data.dashSpeed;
             yield return null;
         }
 
@@ -623,7 +661,7 @@ public class PlayerMovement : MonoBehaviour
         _isDashAttacking = false;
 
         SetGravityScale(Data.gravityScale);
-        RB.velocity = Data.dashEndSpeed * _lastDashDir.normalized; // Sử dụng _lastDashDir
+        RB.velocity = Data.dashEndSpeed * _lastDashDir.normalized;
 
         while (Time.time - startTime <= Data.dashEndTime)
         {
@@ -639,7 +677,7 @@ public class PlayerMovement : MonoBehaviour
         _dashRefilling = true;
         yield return new WaitForSeconds(Data.dashRefillTime);
         _dashRefilling = false;
-        _dashesLeft = Mathf.Min(Data.dashAmount, _dashesLeft + 1);
+        _dashesLeft = Mathf.Min(Data.dashAmount, _dashesLeft + amount);
     }
 
     private void StartDashEffect()
@@ -650,7 +688,6 @@ public class PlayerMovement : MonoBehaviour
 
     private IEnumerator DashEffectCoroutine()
     {
-        // FindObjectOfType<RippleEffect>().Emit(Camera.main.WorldToViewportPoint(transform.position));
         RippleEffect.Instance.Emit(Camera.main.WorldToViewportPoint(transform.position));
         GetComponent<Cinemachine.CinemachineImpulseSource>().GenerateImpulse(_lastDashDir.normalized * 0.15f);
         while (true)
@@ -661,6 +698,19 @@ public class PlayerMovement : MonoBehaviour
             Destroy(shadow, 0.5f);
 
             yield return new WaitForSeconds(Data.shadowDashDelaySecond);
+        }
+    }
+
+    public void ResetDash()
+    {
+        _dashesLeft = Data.dashAmount;
+        _dashRefilling = false;
+        
+        if (sr != null)
+        {
+            _propertyBlock.SetFloat("_EnableReplacement", 0);
+            sr.SetPropertyBlock(_propertyBlock);
+            _isColorReplacementEnabled = false;
         }
     }
     #endregion
@@ -709,6 +759,9 @@ public class PlayerMovement : MonoBehaviour
 
     private bool CanDash()
     {
+        if (IsDashing)
+            return false;
+
         if (!IsDashing && _dashesLeft < Data.dashAmount && LastOnGroundTime > 0 && !_dashRefilling)
         {
             StartCoroutine(nameof(RefillDash), 1);
@@ -736,4 +789,11 @@ public class PlayerMovement : MonoBehaviour
         Gizmos.DrawWireCube(_backWallCheckPoint.position, _wallCheckSize);
     }
     #endregion
+    //  private void OnTriggerEnter2D(Collider2D collision)
+    // {
+    //     if (collision.CompareTag("killzone"))
+    //     {
+    //         sr.color = new Color(0f,0f,0f, 0f);
+    //     }
+    // }
 }

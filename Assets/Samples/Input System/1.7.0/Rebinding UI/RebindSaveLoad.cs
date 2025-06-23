@@ -1,20 +1,30 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.IO;
 
 public class RebindSaveLoad : MonoBehaviour
 {
     public InputActionAsset actions;
 
-    public void OnEnable()
+    private string savePath;
+
+    private void Awake()
     {
-        var rebinds = PlayerPrefs.GetString("rebinds");
-        if (!string.IsNullOrEmpty(rebinds))
-            actions.LoadBindingOverridesFromJson(rebinds);
+        savePath = Path.Combine(Application.persistentDataPath, "rebinds.json");
     }
 
-    public void OnDisable()
+    private void OnEnable()
     {
-        var rebinds = actions.SaveBindingOverridesAsJson();
-        PlayerPrefs.SetString("rebinds", rebinds);
+        if (File.Exists(savePath))
+        {
+            string json = File.ReadAllText(savePath);
+            actions.LoadBindingOverridesFromJson(json);
+        }
+    }
+
+    private void OnDisable()
+    {
+        string json = actions.SaveBindingOverridesAsJson();
+        File.WriteAllText(savePath, json);
     }
 }

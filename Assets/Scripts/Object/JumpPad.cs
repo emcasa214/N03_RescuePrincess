@@ -5,7 +5,7 @@ public class JumpPad : MonoBehaviour
     [SerializeField] private float jumpPadForce = 10f; // Lực nhảy của jump pad
     private Collider2D jumpPadCollider;
     private Animator anim;
-    public PlayerDataWithDash Data;
+
     void Start()
     {
         anim = gameObject.GetComponent<Animator>();
@@ -28,10 +28,11 @@ public class JumpPad : MonoBehaviour
                 // Reset vận tốc Y trước khi áp dụng lực mới
                 playerRb.velocity = new Vector2(0f, 0f);
                 //playerMovement.SetGravityScale(Data.gravityScale);
-                
+
                 // Áp dụng lực nhảy mạnh khi chạm jump pad
                 playerRb.AddForce(Vector2.up * jumpPadForce, ForceMode2D.Impulse);
                 playerMovement.JumpPadState();
+                PlayerMovement.Instance.ResetDash();
             }
         }
     }

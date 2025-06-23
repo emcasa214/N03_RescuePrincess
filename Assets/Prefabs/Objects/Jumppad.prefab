@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1543555755558031385}
   - component: {fileID: 7390690040439496872}
   - component: {fileID: 7077265811340517509}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: JumpPad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -121,7 +121,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   jumpPadForce: 30
-  Data: {fileID: 0}
 --- !u!61 &7077265811340517509
 BoxCollider2D:
   m_ObjectHideFlags: 0

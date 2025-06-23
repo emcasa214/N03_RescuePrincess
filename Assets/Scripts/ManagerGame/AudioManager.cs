@@ -20,7 +20,7 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    public void PlaySound(AudioClip clip, float volume = 1f)
+    public void PlaySound(AudioClip clip, float volume = 0.5f)
     {
         if (clip != null)
             audioSource.PlayOneShot(clip, volume);

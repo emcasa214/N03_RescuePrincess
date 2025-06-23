@@ -156,13 +156,14 @@ public static class CheckpointData
 
     public static void ClearAllData()
     {
+        
         checkpoints.Clear();
         collectedItems.Clear();
         itemCounts.Clear();
         totalStrawberries = 0;
         currentScene = "";
         savedScenes.Clear();
-        PlayerPrefs.DeleteAll();
+        
         PlayerPrefs.Save();
     }
 }
@@ -181,10 +182,9 @@ public class PlayerRespawn : MonoBehaviour
     [SerializeField] private GameObject retrans;
 
     [Header("UI")]
-    [SerializeField] private TextMeshProUGUI itemCountText;
+    private TextMeshProUGUI itemCountText;
     [SerializeField] private Button saveButton;
     [SerializeField] private Button continueButton;
-
     private Rigidbody2D rb;
     private bool isRespawning = false;
     private string currentScene;
@@ -193,6 +193,7 @@ public class PlayerRespawn : MonoBehaviour
     private int tempItemCount = 0;
     private int displayedStrawberryCount = 0;
     private GameObject respawnObject;
+    private bool restartOk = false;
     
 
     private void Awake()
@@ -204,13 +205,14 @@ public class PlayerRespawn : MonoBehaviour
     {
         respawnObject = GameObject.FindGameObjectWithTag("Respawn");
         rb = GetComponent<Rigidbody2D>();
+        itemCountText = GameObject.Find("Score").GetComponent<TextMeshProUGUI>();
         currentScene = SceneManager.GetActiveScene().name;
         CheckpointData.SetCurrentScene(currentScene);
 
         // Tải trạng thái cho scene hiện tại, bất kể có phải scene cuối cùng hay không
         CheckpointData.LoadGameState();
 
-        if (CheckpointData.HasCheckpoint())
+        if (CheckpointData.HasCheckpoint() && !restartOk)
         {
             respawnPosition = CheckpointData.GetLastCheckpoint();
             tempItemCount = CheckpointData.GetItemCount();
@@ -221,6 +223,7 @@ public class PlayerRespawn : MonoBehaviour
             respawnPosition = respawnObject != null ? respawnObject.transform.position : transform.position;
             tempItemCount = 0;
             tempCollectedItems.Clear();
+            restartOk = false;
         }
 
         displayedStrawberryCount = CheckpointData.GetTotalStrawberries();
@@ -244,7 +247,7 @@ public class PlayerRespawn : MonoBehaviour
             }
             StartCoroutine(AnimateStrawberryCount(displayedStrawberryCount, CheckpointData.GetTotalStrawberries()));
             SaveGame(); // Lưu trạng thái ngay khi đạt checkpoint
-            playerSound.PlayCheckPoint();
+            // playerSound.PlayCheckPoint();
         }
 
         if (collision.CompareTag("Strawberry"))
@@ -254,12 +257,15 @@ public class PlayerRespawn : MonoBehaviour
             {
                 tempCollectedItems.Add(itemName);
                 tempItemCount++;
-                collision.gameObject.SetActive(false);
+
+                // ẩn dâu tây đã nhặt
+                // collision.gameObject.SetActive(false);
+
+
                 StartCoroutine(AnimateStrawberryCount(displayedStrawberryCount, displayedStrawberryCount + 1));
                 displayedStrawberryCount++;
             }
-            playerSound.PlayCollect();
-
+            playerSound.PlayCollect(); 
         }
     }
 
@@ -290,7 +296,7 @@ public class PlayerRespawn : MonoBehaviour
     private IEnumerator RespawnWithEffects()
     {
         isRespawning = true;
-
+        Time.timeScale = 0.4f;
         Vector2 currentVelocity = rb.velocity;
         Vector2 knockback = Vector2.up * knockbackMultiplier;
         if (currentVelocity.sqrMagnitude > 0.01f)
@@ -301,7 +307,7 @@ public class PlayerRespawn : MonoBehaviour
         rb.velocity = Vector2.zero;
         rb.AddForce(knockback, ForceMode2D.Impulse);
         yield return new WaitForSeconds(0.1f);
-
+        Time.timeScale = 1f;
         GameObject dead = Instantiate(deadAnim, transform.position, transform.rotation);
         RippleEffect.Instance.Emit(Camera.main.WorldToViewportPoint(transform.position));
         GetComponent<Cinemachine.CinemachineImpulseSource>().GenerateImpulse(rb.velocity.normalized * 0.25f);
@@ -309,11 +315,10 @@ public class PlayerRespawn : MonoBehaviour
         Destroy(dead, 1.17f);
 
         SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
-        Color c = sr.color;
+        
         if (sr != null)
         {
-            c.a = 0f;
-            sr.color = c;
+            sr.color = new Color(0f,0f,0f, 0f);
         }
         rb.simulated = false;
 
@@ -344,9 +349,7 @@ public class PlayerRespawn : MonoBehaviour
     private IEnumerator PlayRespawnOnStart()
     {
         SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
-        Color c = sr.color;
-        c.a = 0f;
-        sr.color = c;
+        sr.color = new Color(0f,0f,0f, 0f);
         rb.simulated = false;
         transform.position = respawnPosition;
         rb.velocity = Vector2.zero;
@@ -373,11 +376,10 @@ public class PlayerRespawn : MonoBehaviour
         yield return new WaitForSecondsRealtime(0.83f);
 
         rb.simulated = true;
-        c.a = 1f;
-        sr.color = c;
+        sr.color = new Color(1f,1f,1f,1f);
         isRespawning = false;
     }
-
+    
     public void Restart()
     {
         CheckpointData.ClearCheckpoint();
@@ -385,6 +387,7 @@ public class PlayerRespawn : MonoBehaviour
         tempItemCount = 0;
         displayedStrawberryCount = CheckpointData.GetTotalStrawberries();
         UpdateItemCountUI();
+        restartOk = true;
         SceneManager.LoadScene(currentScene);
     }
 

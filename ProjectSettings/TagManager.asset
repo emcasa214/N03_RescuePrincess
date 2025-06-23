@@ -15,6 +15,7 @@ TagManager:
   - Weapon
   - Strawberry
   - Win
+  - Crystal
   layers:
   - Default
   - TransparentFX

@@ -660,13 +660,14 @@ GameObject:
   - component: {fileID: 4145668440912574112}
   - component: {fileID: 8069053065450849229}
   - component: {fileID: 7460986387773878803}
+  - component: {fileID: 1476391882027077081}
   m_Layer: 0
   m_Name: ControlMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4145668440912574112
 Transform:
   m_ObjectHideFlags: 0
@@ -713,6 +714,18 @@ MonoBehaviour:
   audioMixer: {fileID: 24100000, guid: 9b335567e6100d347bc597073a386e2b, type: 2}
   musicSlider: {fileID: 6060190712402315111}
   sfxSlider: {fileID: 5729877071140196548}
+--- !u!225 &1476391882027077081
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2469804378809693613}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &2487540036152543205
 GameObject:
   m_ObjectHideFlags: 0
@@ -1346,7 +1359,7 @@ RectTransform:
   m_Father: {fileID: 4992057660953684606}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.54, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: -0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1814,10 +1827,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 3381856074378743527}
   m_HandleRect: {fileID: 306531657914365255}
   m_Direction: 0
-  m_MinValue: -30
-  m_MaxValue: 20
+  m_MinValue: -15
+  m_MaxValue: 15
   m_WholeNumbers: 0
-  m_Value: -3
+  m_Value: -1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -1825,6 +1838,18 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: Volume, Assembly-CSharp
         m_MethodName: UpdateMusicVolume
         m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 7460986387773878803}
+        m_TargetAssemblyTypeName: Volume, Assembly-CSharp
+        m_MethodName: SaveVolume
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -2170,7 +2195,7 @@ RectTransform:
   m_Father: {fileID: 5047319642038330054}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.54, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: -0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2244,8 +2269,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1244353987234148115}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.54, y: 0}
-  m_AnchorMax: {x: 0.54, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: -0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2319,8 +2344,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 4445731152677639979}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.54, y: 0}
-  m_AnchorMax: {x: 0.54, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: -0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2616,10 +2641,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 9028014579353082912}
   m_HandleRect: {fileID: 1473442938310910305}
   m_Direction: 0
-  m_MinValue: -30
-  m_MaxValue: 20
+  m_MinValue: -15
+  m_MaxValue: 15
   m_WholeNumbers: 0
-  m_Value: -3
+  m_Value: -1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -2627,6 +2652,18 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: Volume, Assembly-CSharp
         m_MethodName: UpdateSoundVolume
         m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 7460986387773878803}
+        m_TargetAssemblyTypeName: Volume, Assembly-CSharp
+        m_MethodName: SaveVolume
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
