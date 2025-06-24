@@ -7,6 +7,7 @@ public class ReFillDash : MonoBehaviour
     // Start is called before the first frame update
     private Animator crystalAnim;
     private SpriteRenderer srCrystal;
+    private PlayerSound playerSound;
     void Start()
     {
         crystalAnim = gameObject.GetComponent<Animator>();
@@ -16,7 +17,7 @@ public class ReFillDash : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        playerSound = GameObject.Find("Player").GetComponent<PlayerSound>();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -25,6 +26,7 @@ public class ReFillDash : MonoBehaviour
         {
             PlayerMovement.Instance.ResetDash();
             crystalAnim.SetBool("claim", true);
+            playerSound.PlayAttack();
             StartCoroutine(HideForSeconds(3f)); // Ẩn GameObject trong 2 giây
         }
     }
