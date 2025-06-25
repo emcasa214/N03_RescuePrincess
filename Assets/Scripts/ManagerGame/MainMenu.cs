@@ -7,8 +7,46 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private GameObject settingMenu;
     [SerializeField] private GameObject mainMenu;
     [SerializeField] private GameObject continueButton;
+    private float targetAspect = 16f / 9f; // Tỷ lệ 16:9 (thay đổi theo độ phân giải của bạn, ví dụ 1920/1080)
+
+    private int lastWidth;
+    private int lastHeight;
+
+    void Update()
+    {
+        // Chỉ cập nhật khi kích thước thay đổi
+        if (lastWidth != Screen.width || lastHeight != Screen.height)
+        {
+            UpdateResolution();
+            lastWidth = Screen.width;
+            lastHeight = Screen.height;
+        }
+    }
+
+    void UpdateResolution()
+    {
+        // Lấy kích thước hiện tại của màn hình
+        float windowAspect = (float)Screen.width / (float)Screen.height;
+        float scaleHeight = windowAspect / targetAspect;
+
+        // Tính toán kích thước mới để duy trì tỷ lệ
+        if (scaleHeight < 1.0f)
+        {
+            Rect rect = new Rect(0, 0, Screen.width, Screen.height * scaleHeight);
+            Screen.SetResolution((int)rect.width, (int)rect.height, Screen.fullScreen);
+        }
+        else
+        {
+            float scaleWidth = 1.0f / scaleHeight;
+            Rect rect = new Rect(0, 0, Screen.width * scaleWidth, Screen.height);
+            Screen.SetResolution((int)rect.width, (int)rect.height, Screen.fullScreen);
+        }
+    }
     private void Start()
     {
+        lastWidth = Screen.width;
+        lastHeight = Screen.height;
+        UpdateResolution();
         if (!CheckpointData.HasSavedGame())
         {
             continueButton.SetActive(false);
@@ -66,10 +104,6 @@ public class MainMenu : MonoBehaviour
             CheckpointData.SetCurrentScene("Level");
             SceneManager.LoadScene("Level");
         }
-    }
-    public void Update()
-    {
-
     }
 
     public void DisableMenu(GameObject menuName)

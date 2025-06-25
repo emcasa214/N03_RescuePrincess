@@ -193,7 +193,7 @@ public class PlayerRespawn : MonoBehaviour
     private int tempItemCount = 0;
     private int displayedStrawberryCount = 0;
     private GameObject respawnObject;
-    private bool restartOk = false;
+    public static bool restartOk = false;
     
 
     private void Awake()
@@ -212,7 +212,7 @@ public class PlayerRespawn : MonoBehaviour
         // Tải trạng thái cho scene hiện tại, bất kể có phải scene cuối cùng hay không
         CheckpointData.LoadGameState();
 
-        if (CheckpointData.HasCheckpoint() && !restartOk)
+        if (CheckpointData.HasCheckpoint())
         {
             respawnPosition = CheckpointData.GetLastCheckpoint();
             tempItemCount = CheckpointData.GetItemCount();
@@ -223,8 +223,14 @@ public class PlayerRespawn : MonoBehaviour
             respawnPosition = respawnObject != null ? respawnObject.transform.position : transform.position;
             tempItemCount = 0;
             tempCollectedItems.Clear();
+            
+        }
+        if (restartOk)
+        {
+            respawnPosition = respawnObject != null ? respawnObject.transform.position : transform.position;
             restartOk = false;
         }
+        
 
         displayedStrawberryCount = CheckpointData.GetTotalStrawberries();
         UpdateItemCountUI();

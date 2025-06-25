@@ -94,6 +94,17 @@
                 },
                 {
                     "name": "",
+                    "id": "06d85f2f-bee9-4bde-8db1-e3afee637ffc",
+                    "path": "<XInputController>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Dash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "4ffc24d2-4a6e-4298-b38a-5fb6ebb3c052",
                     "path": "<Keyboard>/z",
                     "interactions": "",
